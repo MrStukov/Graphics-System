@@ -1,3 +1,4 @@
+#include <MainMenuScene.h>
 #include "Application.h"
 
 int main()
@@ -8,7 +9,12 @@ int main()
         return -1;
     }
 
+    MainMenuScene scene;
+
     Application app;
+    app.setMainScene(&scene);
+
+    app.run();
 
     return 0;
 }

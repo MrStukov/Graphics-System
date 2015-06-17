@@ -14,13 +14,19 @@ public:
     virtual ~Scene();
 
     void loop();
+    void stop();
 
+    void setRenderer( SDL_Renderer *renderer);
+    SDL_Renderer * renderer() const;
 protected:
     virtual void update();
     virtual void render();
     virtual void handleEvents();
 
     SDL_Renderer *_renderer;
+
+private:
+    bool _loopDone;
 };
 
 

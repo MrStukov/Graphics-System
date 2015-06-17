@@ -13,7 +13,12 @@ public:
     Application(char const* title="TEST", int width=800, int height=600);
     ~Application();
 
+    void setMainScene(Scene *scene);
+    Scene* mainScene() const;
+
+    void run();
 private:
+    Scene *_mainScene;
 
     SDL_Window *_window;
     SDL_Renderer *_renderer;

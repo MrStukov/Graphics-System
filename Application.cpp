@@ -6,6 +6,7 @@
 
 Application::Application(char const *title, int width, int height)
 {
+    _mainScene = nullptr;
     _ready = true;
     _window = SDL_CreateWindow(title, 0, 0, width, height, SDL_WINDOW_SHOWN);
     if (!_window)
@@ -31,4 +32,24 @@ Application::~Application()
         SDL_DestroyWindow(_window);
     if (_renderer)
         SDL_DestroyRenderer(_renderer);
+}
+
+void Application::setMainScene(Scene *scene)
+{
+    _mainScene = scene;
+    if (_mainScene)
+        _mainScene->setRenderer(_renderer);
+}
+
+Scene *Application::mainScene() const
+{
+    return _mainScene;
+}
+
+void Application::run()
+{
+    if (!_mainScene)
+        printf("[Application::run] Error: Main scene was not set.\n");
+    else
+        _mainScene->loop();
 }
