@@ -19,6 +19,8 @@ public:
     void setRenderer( SDL_Renderer *renderer);
     SDL_Renderer * renderer() const;
 protected:
+    virtual void postSetRender();
+
     virtual void update();
     virtual void render();
     virtual void handleEvents();

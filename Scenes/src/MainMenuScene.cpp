@@ -4,8 +4,8 @@
 
 #include "MainMenuScene.h"
 
-MainMenuScene::MainMenuScene( SDL_Renderer *renderer) :
-    Scene(renderer)
+MainMenuScene::MainMenuScene() :
+    Scene()
 {
     _buttons.push_back(
             ScreenButton(nullptr, _renderer, 10, 10, nullptr)
@@ -16,7 +16,7 @@ void MainMenuScene::render()
 {
     SDL_RenderClear(_renderer);
 
-
+    std::for_each( _buttons.begin(), _buttons.end(), std::mem_fun_ref(&ScreenButton::render));
 
     SDL_RenderPresent(_renderer);
 }
@@ -45,4 +45,13 @@ void MainMenuScene::handleEvents()
 void MainMenuScene::functionExit()
 {
     stop();
+}
+
+void MainMenuScene::postSetRender()
+{
+    std::for_each(_buttons.begin(), _buttons.end(), [this](ScreenButton &object)
+    {
+        printf("%d\n", _renderer);
+        object.setRenderer(_renderer);
+    });
 }

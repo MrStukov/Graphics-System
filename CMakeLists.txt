@@ -21,6 +21,6 @@ add_executable(Graphics_System ${SOURCE_FILES}
     GraphicsItems/include/ScreenButton.h
     GraphicsItems/src/ScreenItem.cpp
     GraphicsItems/include/ScreenItem.h
-)
+ResourceHolder.cpp ResourceHolder.h)
 
 target_link_libraries(Graphics_System -lSDL2)

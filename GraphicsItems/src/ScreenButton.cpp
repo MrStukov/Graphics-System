@@ -84,6 +84,7 @@ void ScreenButton::render()
 
 void ScreenButton::setTexture(SDL_Texture *texture)
 {
+    _texture = texture;
     // TODO: Исправить printf на logger
     if (texture)
     {

@@ -8,16 +8,20 @@
 #include <Scene.h>
 #include <vector>
 #include <ScreenButton.h>
+#include <algorithm>
+#include <functional>
 
 class MainMenuScene : public Scene
 {
 public:
-    MainMenuScene(SDL_Renderer *renderer);
+    MainMenuScene();
 
 protected:
     void render() override;
     void update() override;
     void handleEvents() override;
+
+    virtual void postSetRender() override;
 
 private:
     void functionExit();
