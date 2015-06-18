@@ -4,10 +4,12 @@
 
 #include "MainMenuScene.h"
 
-MainMenuScene::MainMenuScene() :
-    Scene()
+MainMenuScene::MainMenuScene( SDL_Renderer *renderer) :
+    Scene(renderer)
 {
-
+    _buttons.push_back(
+            ScreenButton(nullptr, _renderer, 10, 10, nullptr)
+    );
 }
 
 void MainMenuScene::render()
@@ -38,4 +40,9 @@ void MainMenuScene::handleEvents()
                 break;
         }
     }
+}
+
+void MainMenuScene::functionExit()
+{
+    stop();
 }

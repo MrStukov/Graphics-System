@@ -7,11 +7,12 @@
 
 #include <Scene.h>
 #include <vector>
+#include <ScreenButton.h>
 
 class MainMenuScene : public Scene
 {
 public:
-    MainMenuScene();
+    MainMenuScene(SDL_Renderer *renderer);
 
 protected:
     void render() override;
@@ -19,7 +20,9 @@ protected:
     void handleEvents() override;
 
 private:
+    void functionExit();
 
+    std::vector < ScreenButton > _buttons;
 };
 
 
