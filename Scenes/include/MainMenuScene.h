@@ -21,7 +21,7 @@ protected:
     void update() override;
     void handleEvents() override;
 
-    virtual void postSetRender() override;
+    virtual void init() override;
 
 private:
     void functionExit();

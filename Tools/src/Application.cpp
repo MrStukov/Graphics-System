@@ -7,8 +7,9 @@
 Application::Application(char const *title, int width, int height)
 {
     _mainScene = nullptr;
+    _resourceHolder = nullptr;
     _ready = true;
-    _window = SDL_CreateWindow(title, 0, 0, width, height, SDL_WINDOW_SHOWN);
+    _window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
     if (!_window)
     {
         printf("[Application::Application] Error: Can't init window. Error: %s\n", SDL_GetError());
@@ -20,10 +21,14 @@ Application::Application(char const *title, int width, int height)
     _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!_renderer)
     {
-        printf("[Application::Application] Error: Can't init renderer. Error: %s\n", SDL_GetError());
+        printf("[Application::Application] Error: Can't init renderer. Error: %s\n",
+               SDL_GetError());
         _ready = false;
         return;
     }
+
+    _resourceHolder = new ResourceHolder(_renderer);
+
 }
 
 Application::~Application()
@@ -32,13 +37,18 @@ Application::~Application()
         SDL_DestroyWindow(_window);
     if (_renderer)
         SDL_DestroyRenderer(_renderer);
+    if (_resourceHolder)
+        delete _resourceHolder;
 }
 
 void Application::setMainScene(Scene *scene)
 {
     _mainScene = scene;
     if (_mainScene)
-        _mainScene->setRenderer(_renderer);
+    {
+        _mainScene->setResourceHolder( _resourceHolder );
+        _mainScene->setRenderer( _renderer );
+    }
 }
 
 Scene *Application::mainScene() const

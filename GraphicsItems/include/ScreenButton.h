@@ -6,6 +6,7 @@
 #define GRAPHICS_SYSTEM_SCREENBUTTON_H
 
 #include <SDL2/SDL.h>
+#include <functional>
 #include "ScreenItem.h"
 
 //TODO: Добавить вызываемую ф-цию.
@@ -23,7 +24,7 @@ class ScreenButton : public ScreenItem
 {
 public:
     ScreenButton();
-    ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y, void (*callBack)());
+    ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y, std::function<void()> callback);
     ~ScreenButton();
 
     void setTexture(SDL_Texture *texture);
@@ -36,7 +37,7 @@ public:
     void render();
     void handleEvent(SDL_Event *event);
 
-    void setCallback( void (*callback)() );
+    void setCallback( std::function<void()> function );
 
 private:
     enum ButtonState
@@ -54,9 +55,7 @@ private:
     int _textureWidth;
     int _textureHeight;
 
-    void (*_callbackFunction)();
-
-    SDL_Renderer *_renderer;
+    std::function<void()> _callbackFunction;
 };
 
 

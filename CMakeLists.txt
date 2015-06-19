@@ -8,11 +8,12 @@ set(SOURCE_FILES main.cpp)
 include_directories(
     Scenes/include
     GraphicsItems/include
+    Tools/include
 )
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../Graphics-System_executable/)
 add_executable(Graphics_System ${SOURCE_FILES}
-    Application.cpp
-    Application.h
+    Tools/src/Application.cpp
+    Tools/include/Application.h
     Scenes/src/Scene.cpp
     Scenes/include/Scene.h
     Scenes/src/MainMenuScene.cpp
@@ -21,6 +22,8 @@ add_executable(Graphics_System ${SOURCE_FILES}
     GraphicsItems/include/ScreenButton.h
     GraphicsItems/src/ScreenItem.cpp
     GraphicsItems/include/ScreenItem.h
-ResourceHolder.cpp ResourceHolder.h)
+    Tools/src/ResourceHolder.cpp
+    Tools/include/ResourceHolder.h
+)
 
-target_link_libraries(Graphics_System -lSDL2)
+target_link_libraries(Graphics_System -lSDL2 -lSDL2_image)

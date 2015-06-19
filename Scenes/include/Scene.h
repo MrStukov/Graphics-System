@@ -6,6 +6,7 @@
 #define GRAPHICS_SYSTEM_SCENE_H
 
 #include <SDL2/SDL.h>
+#include "ResourceHolder.h"
 
 class Scene
 {
@@ -18,14 +19,18 @@ public:
 
     void setRenderer( SDL_Renderer *renderer);
     SDL_Renderer * renderer() const;
+
+    void setResourceHolder( ResourceHolder *resourceHolder );
+    ResourceHolder *resourceHolder() const;
 protected:
-    virtual void postSetRender();
+    virtual void init();
 
     virtual void update();
     virtual void render();
     virtual void handleEvents();
 
     SDL_Renderer *_renderer;
+    ResourceHolder *_resourceHolder;
 
 private:
     bool _loopDone;

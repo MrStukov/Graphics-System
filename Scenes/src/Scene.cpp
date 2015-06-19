@@ -17,6 +17,7 @@ Scene::~Scene()
 
 void Scene::loop()
 {
+    init();
     _loopDone = false;
     while (!_loopDone)
     {
@@ -44,8 +45,6 @@ void Scene::handleEvents()
 void Scene::setRenderer(SDL_Renderer *renderer)
 {
     _renderer = renderer;
-    if (_renderer)
-        postSetRender();
 }
 
 SDL_Renderer * Scene::renderer() const
@@ -58,7 +57,17 @@ void Scene::stop()
     _loopDone = true;
 }
 
-void Scene::postSetRender()
+void Scene::setResourceHolder(ResourceHolder *resourceHolder)
+{
+    _resourceHolder = resourceHolder;
+}
+
+ResourceHolder *Scene::resourceHolder() const
+{
+    return _resourceHolder;
+}
+
+void Scene::init()
 {
 
 }

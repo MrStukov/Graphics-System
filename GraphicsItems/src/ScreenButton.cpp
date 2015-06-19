@@ -19,7 +19,7 @@ ScreenButton::ScreenButton() :
     _dstRect.h = 0;
 }
 
-ScreenButton::ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y, void (*callback)()) :
+ScreenButton::ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y, std::function<void()> callback) :
     ScreenItem( renderer )
 {
     _state = ButtonState_Released;
@@ -30,6 +30,7 @@ ScreenButton::ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, 
     _dstRect.y = y;
     _dstRect.w = _textureWidth;
     _dstRect.h = _textureHeight;
+    _callbackFunction = callback;
 }
 
 ScreenButton::~ScreenButton()
@@ -56,7 +57,6 @@ void ScreenButton::render()
     {
         case ButtonState_Released:
             sourceRect = {0, 0, _textureWidth, partSize};
-
             if (SDL_RenderCopy(_renderer, _texture, &sourceRect, &_dstRect) != 0) // TODO: #3
                 printf("[ScreenButton::render] Error: Can't copy texture to renderer. Error: %s\n",
                        SDL_GetError());
@@ -103,7 +103,7 @@ void ScreenButton::setTexture(SDL_Texture *texture)
     }
 
     _dstRect.w = _textureWidth;
-    _dstRect.h = _textureHeight;
+    _dstRect.h = _textureHeight / 3;
 }
 
 SDL_Texture *ScreenButton::texture() const
@@ -115,27 +115,32 @@ void ScreenButton::handleEvent(SDL_Event *event)
 {
     switch (event->type)
     {
-        case SDL_MOUSEBUTTONDOWN:
-            if (_state == ButtonState_Hover)
-            {
-                _state = ButtonState_Pressed;
+    case SDL_MOUSEBUTTONDOWN:
+        if (_state == ButtonState_Hover)
+        {
+            _state = ButtonState_Pressed;
 
-                if (_callbackFunction)
-                    _callbackFunction();
-            }
-            break;
+            if (_callbackFunction)
+                _callbackFunction();
+        }
+        break;
 
-        case SDL_MOUSEMOTION:
-            if (event->motion.x > _dstRect.x &&
-                event->motion.x < (_dstRect.x + _dstRect.w) &&
-                event->motion.y > _dstRect.y &&
-                event->motion.y < (_dstRect.y + _dstRect.h))
-                _state = ButtonState_Hover;
-            else if (_state == ButtonState_Hover)
-                _state = ButtonState_Released;
-            break;
-        default:
-            break;
+    case SDL_MOUSEBUTTONUP:
+        if (_state == ButtonState_Pressed)
+            _state = ButtonState_Released;
+
+    case SDL_MOUSEMOTION:
+        if (event->motion.x > _dstRect.x &&
+            event->motion.x < (_dstRect.x + _dstRect.w) &&
+            event->motion.y > _dstRect.y &&
+            event->motion.y < (_dstRect.y + _dstRect.h) &&
+            _state != ButtonState_Pressed)
+            _state = ButtonState_Hover;
+        else if (_state == ButtonState_Hover)
+            _state = ButtonState_Released;
+        break;
+    default:
+        break;
     }
 }
 
@@ -155,7 +160,7 @@ int ScreenButton::y() const
     return _dstRect.y;
 }
 
-void ScreenButton::setCallback(void (*callBack)())
+void ScreenButton::setCallback(std::function<void()> callback)
 {
-    _callbackFunction = callBack;
+    _callbackFunction = callback;
 }

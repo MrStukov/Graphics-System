@@ -8,7 +8,7 @@ MainMenuScene::MainMenuScene() :
     Scene()
 {
     _buttons.push_back(
-            ScreenButton(nullptr, _renderer, 10, 10, nullptr)
+            ScreenButton(nullptr, _renderer, 10, 10, std::bind(&MainMenuScene::functionExit, this))
     );
 }
 
@@ -16,7 +16,12 @@ void MainMenuScene::render()
 {
     SDL_RenderClear(_renderer);
 
-    std::for_each( _buttons.begin(), _buttons.end(), std::mem_fun_ref(&ScreenButton::render));
+//    std::for_each( _buttons.begin(), _buttons.end(), std::mem_fun_ref(&ScreenButton::render));
+
+    for (auto button : _buttons)
+    {
+        button.render();
+    }
 
     SDL_RenderPresent(_renderer);
 }
@@ -31,6 +36,11 @@ void MainMenuScene::handleEvents()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
+        for (std::vector < ScreenButton >::iterator iterator = _buttons.begin();
+             iterator != _buttons.end();
+             iterator++)
+            iterator->handleEvent(&event);
+
         switch (event.type)
         {
             case SDL_QUIT:
@@ -47,11 +57,12 @@ void MainMenuScene::functionExit()
     stop();
 }
 
-void MainMenuScene::postSetRender()
+void MainMenuScene::init()
 {
-    std::for_each(_buttons.begin(), _buttons.end(), [this](ScreenButton &object)
-    {
-        printf("%d\n", _renderer);
-        object.setRenderer(_renderer);
-    });
+    for (std::vector < ScreenButton >::iterator iterator = _buttons.begin();
+         iterator != _buttons.end();
+         iterator++)
+        iterator->setRenderer(_renderer);
+
+    _buttons[0].setTexture( _resourceHolder->loadTexture("images/test_button.png"));
 }
