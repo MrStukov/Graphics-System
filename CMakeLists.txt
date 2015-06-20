@@ -9,9 +9,12 @@ include_directories(
     Scenes/include
     GraphicsItems/include
     Tools/include
+    Libraries/Tinyxml2
 )
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../Graphics-System_executable/)
 add_executable(Graphics_System ${SOURCE_FILES}
+    Libraries/Tinyxml2/tinyxml2.cpp
+    Libraries/Tinyxml2/tinyxml2.h
     Tools/src/Application.cpp
     Tools/include/Application.h
     Scenes/src/Scene.cpp
@@ -24,6 +27,8 @@ add_executable(Graphics_System ${SOURCE_FILES}
     GraphicsItems/include/ScreenItem.h
     Tools/src/ResourceHolder.cpp
     Tools/include/ResourceHolder.h
-Tools/TiledMap.cpp Tools/TiledMap.h)
+    Tools/src/TiledMap.cpp
+    Tools/include/TiledMap.h
+)
 
 target_link_libraries(Graphics_System -lSDL2 -lSDL2_image)
