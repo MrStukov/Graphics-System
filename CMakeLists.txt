@@ -24,6 +24,6 @@ add_executable(Graphics_System ${SOURCE_FILES}
     GraphicsItems/include/ScreenItem.h
     Tools/src/ResourceHolder.cpp
     Tools/include/ResourceHolder.h
-)
+Tools/TiledMap.cpp Tools/TiledMap.h)
 
 target_link_libraries(Graphics_System -lSDL2 -lSDL2_image)
