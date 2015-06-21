@@ -25,6 +25,7 @@ protected:
 
 private:
     void functionExit();
+    void functionLoadTestMap();
 
     std::vector < ScreenButton > _buttons;
 };

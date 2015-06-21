@@ -6,10 +6,14 @@
 #define GRAPHICS_SYSTEM_TILEDMAP_H
 
 #include <string>
-#include <ResourceHolder.h>
-#include "tinyxml2.h"
 #include <fstream>
 #include <vector>
+#include <algorithm>
+#include "ResourceHolder.h"
+#include "tinyxml2.h"
+#include "Compression.h"
+
+// TODO: Добавить рендер с предусмотрением неполного рендеринга
 
 class TiledMap
 {
@@ -42,11 +46,12 @@ private:
         ResourceHolder* resourceHolder() const;
         void setResourceHolder(ResourceHolder* holder);
 
-        void loadImage( const std::string &path );
+        bool loadImage( const std::string &path );
 
         SDL_Texture* texture() const;
 
         SDL_Rect getTileSourceRect( unsigned int id );
+        bool containsId( unsigned int id ) const;
     private:
         // Длина и ширина тайла
         unsigned int _tileWidth;
@@ -66,13 +71,48 @@ private:
     class TileLayer
     {
     public:
-        TileLayer();
+        TileLayer(ResourceHolder *holder=nullptr);
         ~TileLayer();
 
-        bool setData( const std::string &data, bool compression=true, bool encoding=true);
+        bool setData( std::string data, std::vector < TiledMap::Tileset >& tilesets, bool compression=true, bool encoding=true);
+
+        void clear();
+
+        void setResourceHolder( ResourceHolder *holder );
+        ResourceHolder *resourceHolder() const;
+
+        void setSize( unsigned int width, unsigned int height );
+
+        void setWidth( unsigned int width );
+        unsigned int width() const;
+
+        void setHeight( unsigned int height );
+        unsigned int height() const;
+
+        void setTileSize( unsigned int tileWidth, unsigned tileHeight );
+
+        void setTileWidth( unsigned int tileWidth );
+        unsigned int tileWidth() const;
+
+        void setTileHeight( unsigned int tileHeight );
+        unsigned int tileHeight() const;
 
     private:
-        SDL_Texture *_layerTexture;
+        struct TileData
+        {
+            unsigned int id;
+            unsigned int tilesetIndex;
+        };
+
+        unsigned int _tileWidth;
+        unsigned int _tileHeight;
+
+        unsigned int _width;
+        unsigned int _height;
+        ResourceHolder *_resourceHolder;
+
+
+        std::vector < TileData > _data;
     };
     /*
      * Приватные функции.
@@ -90,12 +130,14 @@ private:
      */
     bool processMapMetadata( tinyxml2::XMLElement *mapNode );
     bool processTileset( tinyxml2::XMLElement *tilesetNode );
+    bool processTileLayer( tinyxml2::XMLElement *tileLayerNode );
 
     /*
      * Приватные члены.
      */
 
     std::vector < TiledMap::Tileset> _tilesets;
+    std::vector < TiledMap::TileLayer > _tileLayers;
 
     ResourceHolder *_resourceHolder;
 };

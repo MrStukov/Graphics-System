@@ -19,6 +19,8 @@ public:
 
     SDL_Texture* loadTexture(const std::string &path);
 
+    SDL_Surface* generateSurface(char const *textureName);
+
     void setRenderer( SDL_Renderer *renderer);
     SDL_Renderer* renderer() const;
 
@@ -27,6 +29,7 @@ private:
     SDL_Renderer *_renderer;
 
     std::map<std::string, SDL_Texture*> _textures;
+    std::map<std::string, SDL_Surface*> _generatedSurface;
 };
 
 

@@ -29,6 +29,8 @@ add_executable(Graphics_System ${SOURCE_FILES}
     Tools/include/ResourceHolder.h
     Tools/src/TiledMap.cpp
     Tools/include/TiledMap.h
-)
+    Tools/src/Compression.cpp
+    Tools/include/Compression.h
+Scenes/src/GameTestScene.cpp Scenes/include/GameTestScene.h)
 
-target_link_libraries(Graphics_System -lSDL2 -lSDL2_image)
+target_link_libraries(Graphics_System -lSDL2 -lSDL2_image -lz)

@@ -11,11 +11,7 @@ ResourceHolder::ResourceHolder(SDL_Renderer *renderer)
 
 ResourceHolder::~ResourceHolder()
 {
-    for (std::map < std::string, SDL_Texture* >::iterator iterator = _textures.begin();
-         iterator != _textures.end();
-         iterator++)
-        SDL_DestroyTexture(iterator->second);
-    _textures.clear();
+    clear();
 }
 
 SDL_Texture *ResourceHolder::loadTexture(const std::string &path)
@@ -57,4 +53,13 @@ void ResourceHolder::setRenderer(SDL_Renderer *renderer)
 SDL_Renderer *ResourceHolder::renderer() const
 {
     return _renderer;
+}
+
+void ResourceHolder::clear()
+{
+    for (std::map < std::string, SDL_Texture* >::iterator iterator = _textures.begin();
+         iterator != _textures.end();
+         iterator++)
+        SDL_DestroyTexture(iterator->second);
+    _textures.clear();
 }

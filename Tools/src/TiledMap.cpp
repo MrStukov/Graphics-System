@@ -31,9 +31,17 @@ void TiledMap::Tileset::setResourceHolder(ResourceHolder *holder)
     _resourceHolder = holder;
 }
 
-void TiledMap::Tileset::loadImage(const std::string &path)
+bool TiledMap::Tileset::loadImage(const std::string &path)
 {
-    // TODO: Добавить реализацию
+    if (!_resourceHolder)
+    {
+        printf("[Tileset::loadImage] Error: Can't load image for tileset. No resource holder.\n");
+        return false;
+    }
+
+    _texture = _resourceHolder->loadTexture(path);
+
+    return true;
 }
 
 SDL_Texture *TiledMap::Tileset::texture() const
@@ -45,6 +53,11 @@ SDL_Rect TiledMap::Tileset::getTileSourceRect(unsigned int id)
 {
     // TODO: Добавить реализацию
     return SDL_Rect();
+}
+
+bool TiledMap::Tileset::containsId(unsigned int id) const
+{
+    return !(id < _startId || id > (_startId + _numberTilesX * _numberTilesY));
 }
 
 TiledMap::TiledMap()
@@ -128,7 +141,15 @@ bool TiledMap::loadingParsing(const std::string &data)
     if (error != tinyxml2::XML_NO_ERROR)
         return false;
 
-    tinyxml2::XMLElement *tilesetElement = document.FirstChildElement("tileset");
+    tinyxml2::XMLElement *mapElement = document.FirstChildElement("map");
+    if (!mapElement)
+    {
+        printf("[TiledMap::loadingParsing] Error: Can't get map node.\n");
+        return false;
+    }
+
+    // Заргузка тайлсетов
+    tinyxml2::XMLElement *tilesetElement = mapElement->FirstChildElement("tileset");
     while (tilesetElement)
     {
         // Обработка тайлсетов
@@ -140,7 +161,21 @@ bool TiledMap::loadingParsing(const std::string &data)
         tilesetElement = tilesetElement->NextSiblingElement("tileset");
     }
 
+    // Загрузка слоев с тайлами
+    tinyxml2::XMLElement *tileLayerElement = mapElement->FirstChildElement("layer");
+    while (tileLayerElement)
+    {
+        if (!processTileLayer(tileLayerElement))
+        {
+            printf("[TiledMap::loadingParsing] Error: Can't load tile layer: %s\n",
+                   tileLayerElement->Attribute("name"));
+            return false;
+        }
+        tileLayerElement = tileLayerElement->NextSiblingElement("layer");
+    }
+
     // TODO: Закончить обработку файла с картой.
+    return true;
 }
 
 bool TiledMap::processMapMetadata(tinyxml2::XMLElement *mapNode)
@@ -165,14 +200,190 @@ bool TiledMap::processTileset(tinyxml2::XMLElement *tilesetNode)
         return false;
     }
 
+
     // TODO: Добавить стандартный аргумент для source.
     _tilesets.push_back( Tileset(
-        imageNode->Attribute("source", ""),
-        (unsigned int) atoi(tilesetNode->Attribute("tilewidth", "32")),
-        (unsigned int) atoi(tilesetNode->Attribute("tileheight", "32")),
-        (unsigned int) atoi(tilesetNode->Attribute("firstgid", "0")),
+        imageNode->Attribute("source"),
+        (unsigned int) atoi(tilesetNode->Attribute("tilewidth")),
+        (unsigned int) atoi(tilesetNode->Attribute("tileheight")),
+        (unsigned int) atoi(tilesetNode->Attribute("firstgid")),
         _resourceHolder
     ));
 
     return true;
+}
+
+bool TiledMap::processTileLayer(tinyxml2::XMLElement *tileLayerNode)
+{
+    // Поиск элемента с данными.
+    tinyxml2::XMLElement *dataNode = tileLayerNode->FirstChildElement("data");
+    if (!dataNode)
+    {
+        printf("[TiledMap::processTileLayer] Error: Can't find data node of layer: %s\n",
+               tileLayerNode->Attribute("name"));
+        return false;
+    }
+
+    // Определение наличия сжатия
+    bool encoding = false;
+    bool compression = false;
+
+    if (strcmp(dataNode->Attribute("encoding"), "base64") == 0)
+        encoding = true;
+
+    if (strcmp(dataNode->Attribute("compression"), "zlib") == 0)
+        compression = true;
+
+    // Создание объекта со слоем.
+    TileLayer layer(_resourceHolder);
+    layer.setSize(
+            (unsigned int) atoi(tileLayerNode->Attribute("width")),
+            (unsigned int) atoi(tileLayerNode->Attribute("height"))
+    );
+
+    if (!layer.setData(dataNode->GetText(), _tilesets, compression, encoding))
+    {
+        printf("[TiledMap::processTileLayer] Error: Can't proceed layer data of layer: %s\n",
+               tileLayerNode->Attribute("name"));
+        return false;
+    }
+
+    _tileLayers.push_back(layer);
+
+    return true;
+}
+
+TiledMap::TileLayer::TileLayer(ResourceHolder *holder)
+{
+    _resourceHolder = holder;
+}
+
+TiledMap::TileLayer::~TileLayer()
+{
+
+}
+
+void TiledMap::TileLayer::setResourceHolder(ResourceHolder *holder)
+{
+    _resourceHolder = holder;
+}
+
+ResourceHolder *TiledMap::TileLayer::resourceHolder() const
+{
+    return _resourceHolder;
+}
+
+void TiledMap::TileLayer::clear()
+{
+    _tileWidth = 0;
+    _tileHeight = 0;
+
+    _width = 0;
+    _height = 0;
+
+    _data.clear();
+}
+
+bool TiledMap::TileLayer::setData(std::string data, std::vector<TiledMap::Tileset> &tilesets, bool compression,
+                                  bool encoding)
+{
+    // Очистка данных.
+    data.erase(std::remove(data.begin(), data.end(), ' '), data.end());
+    data.erase(std::remove(data.begin(), data.end(), '\n'), data.end());
+
+    const char * decodedData = nullptr;
+    int length = 0;
+    if (encoding)
+        decodedData = Compression::base64Decode(data.c_str(), (int) data.length(), &length, false);
+    else
+    {
+        length = (int) data.length();
+        decodedData = data.c_str();
+    }
+
+    if (compression)
+        decodedData = Compression::zlibInflate(decodedData, length, &length, encoding);
+
+    if (_width * _height * 4 != length)
+    {
+        printf("[TileLayer::setData] Error: Data size is not equal with map size. %d * 4 != %d\n",
+               _width * _height, length);
+        return false;
+    }
+
+    // Распаковка карты
+    _data.reserve( _width * _height );
+    for (unsigned int tileIndex = 0; tileIndex < _width * _height; tileIndex++)
+    {
+        unsigned int byte = 0;
+        for (unsigned int byteIndex = 0; byteIndex < 4; byteIndex++)
+            byte += pow(256, byteIndex) * (unsigned char) decodedData[tileIndex * 4 + byteIndex];
+
+        TileData tileData;
+        tileData.id = byte;
+
+        // Поиск правильного тайлсета
+        unsigned int i=0;
+        for (std::vector < TiledMap::Tileset >::iterator iterator = tilesets.begin();
+             iterator != tilesets.end();
+             iterator++, i++)
+            if ((*iterator).containsId(byte))
+                tileData.tilesetIndex = i;
+
+        _data.push_back(tileData);
+    }
+
+    return true;
+}
+
+void TiledMap::TileLayer::setWidth(unsigned int width)
+{
+    _width = width;
+}
+
+unsigned int TiledMap::TileLayer::width() const
+{
+    return _width;
+}
+
+void TiledMap::TileLayer::setHeight(unsigned int height)
+{
+    _height = height;
+}
+
+unsigned int TiledMap::TileLayer::height() const
+{
+    return _height;
+}
+
+void TiledMap::TileLayer::setSize(unsigned int width, unsigned int height)
+{
+    _width = width;
+    _height = height;
+}
+
+void TiledMap::TileLayer::setTileSize(unsigned int tileWidth, unsigned tileHeight)
+{
+    _tileWidth = tileWidth;
+    _tileHeight = tileHeight;
+}
+
+void TiledMap::TileLayer::setTileWidth(unsigned int tileWidth)
+{
+    _tileWidth = tileWidth;
+}
+
+unsigned int TiledMap::TileLayer::tileWidth() const
+{
+    return _tileWidth;
+}
+
+void TiledMap::TileLayer::setTileHeight(unsigned int tileHeight)
+{
+    _tileHeight = tileHeight;
+}
+
+unsigned int TiledMap::TileLayer::tileHeight() const
+{
+    return _tileHeight;
 }
