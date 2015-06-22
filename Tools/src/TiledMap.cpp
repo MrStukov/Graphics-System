@@ -3,81 +3,16 @@
 //
 
 #include "TiledMap.h"
-
-TiledMap::Tileset::Tileset(const std::string &path, unsigned int tileWidth, unsigned int tileHeight,
-                                       unsigned int startId, ResourceHolder *holder)
-{
-    _tileWidth = tileWidth;
-    _tileHeight = tileHeight;
-    _resourceHolder = holder;
-    _startId = startId;
-
-    _texture = nullptr;
-    loadImage( path );
-}
-
-TiledMap::Tileset::~Tileset()
-{
-
-}
-
-ResourceHolder *TiledMap::Tileset::resourceHolder() const
-{
-    return _resourceHolder;
-}
-
-void TiledMap::Tileset::setResourceHolder(ResourceHolder *holder)
-{
-    _resourceHolder = holder;
-}
-
-bool TiledMap::Tileset::loadImage(const std::string &path)
-{
-    if (!_resourceHolder)
-    {
-        printf("[Tileset::loadImage] Error: Can't load image for tileset. No resource holder.\n");
-        return false;
-    }
-
-    _texture = _resourceHolder->loadTexture(path);
-
-    int width = 0;
-    int height = 0;
-
-    SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
-
-    _numberTilesX = width / _tileWidth;
-    _numberTilesY = height / _tileHeight;
-
-    return true;
-}
-
-SDL_Texture *TiledMap::Tileset::texture() const
-{
-    return _texture;
-}
-
-SDL_Rect TiledMap::Tileset::getTileSourceRect(unsigned int id)
-{
-    unsigned int resultID = id - _startId;
-
-    unsigned int x = resultID % _numberTilesX;
-    unsigned int y = resultID / _numberTilesX;
-
-    SDL_Rect rect = {
-            (int) (x * _tileWidth),
-            (int) (y * _tileHeight),
-            (int) _tileWidth,
-            (int) _tileHeight
-    };
-
-    return rect;
-}
-
-bool TiledMap::Tileset::containsId(unsigned int id) const
-{
-    return !(id < _startId || id > (_startId + _numberTilesX * _numberTilesY));
-}
+/*
+  _______   _   _              _   __  __
+ |__   __| (_) | |            | | |  \/  |
+    | |     _  | |   ___    __| | | \  / |   __ _   _ __
+    | |    | | | |  / _ \  / _` | | |\/| |  / _` | | '_ \
+    | |    | | | | |  __/ | (_| | | |  | | | (_| | | |_) |
+    |_|    |_| |_|  \___|  \__,_| |_|  |_|  \__,_| | .__/
+                                                   | |
+                                                   |_|
+ */
 
 TiledMap::TiledMap()
 {
@@ -241,11 +176,11 @@ bool TiledMap::processTileset(tinyxml2::XMLElement *tilesetNode)
     }
 
     _tilesets.push_back( Tileset(
-        imageNode->Attribute("source"),
-        (unsigned int) atoi(tilesetNode->Attribute("tilewidth")),
-        (unsigned int) atoi(tilesetNode->Attribute("tileheight")),
-        (unsigned int) atoi(tilesetNode->Attribute("firstgid")),
-        _resourceHolder
+            imageNode->Attribute("source"),
+            (unsigned int) atoi(tilesetNode->Attribute("tilewidth")),
+            (unsigned int) atoi(tilesetNode->Attribute("tileheight")),
+            (unsigned int) atoi(tilesetNode->Attribute("firstgid")),
+            _resourceHolder
     ));
 
     return true;
@@ -295,6 +230,110 @@ bool TiledMap::processTileLayer(tinyxml2::XMLElement *tileLayerNode)
 
     return true;
 }
+
+bool TiledMap::renderLower(SDL_Renderer *renderer, unsigned int x, unsigned int y)
+{
+    for (unsigned int i=0; i < _tileLayers.size(); i++)
+        _tileLayers[i].render( renderer, x, y );
+    return true;
+}
+
+/*
+  _______   _   _              _   __  __                           _______   _   _                       _
+ |__   __| (_) | |            | | |  \/  |                  _   _  |__   __| (_) | |                     | |
+    | |     _  | |   ___    __| | | \  / |   __ _   _ __   (_) (_)    | |     _  | |   ___   ___    ___  | |_
+    | |    | | | |  / _ \  / _` | | |\/| |  / _` | | '_ \             | |    | | | |  / _ \ / __|  / _ \ | __|
+    | |    | | | | |  __/ | (_| | | |  | | | (_| | | |_) |  _   _     | |    | | | | |  __/ \__ \ |  __/ | |_
+    |_|    |_| |_|  \___|  \__,_| |_|  |_|  \__,_| | .__/  (_) (_)    |_|    |_| |_|  \___| |___/  \___|  \__|
+                                                   | |
+                                                   |_|
+ */
+
+TiledMap::Tileset::Tileset(const std::string &path, unsigned int tileWidth, unsigned int tileHeight,
+                                       unsigned int startId, ResourceHolder *holder)
+{
+    _tileWidth = tileWidth;
+    _tileHeight = tileHeight;
+    _resourceHolder = holder;
+    _startId = startId;
+
+    _texture = nullptr;
+    loadImage( path );
+}
+
+TiledMap::Tileset::~Tileset()
+{
+
+}
+
+ResourceHolder *TiledMap::Tileset::resourceHolder() const
+{
+    return _resourceHolder;
+}
+
+void TiledMap::Tileset::setResourceHolder(ResourceHolder *holder)
+{
+    _resourceHolder = holder;
+}
+
+bool TiledMap::Tileset::loadImage(const std::string &path)
+{
+    if (!_resourceHolder)
+    {
+        printf("[Tileset::loadImage] Error: Can't load image for tileset. No resource holder.\n");
+        return false;
+    }
+
+    _texture = _resourceHolder->loadTexture(path);
+
+    int width = 0;
+    int height = 0;
+
+    SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
+
+    _numberTilesX = width / _tileWidth;
+    _numberTilesY = height / _tileHeight;
+
+    return true;
+}
+
+SDL_Texture *TiledMap::Tileset::texture() const
+{
+    return _texture;
+}
+
+SDL_Rect TiledMap::Tileset::getTileSourceRect(unsigned int id)
+{
+    unsigned int resultID = id - _startId;
+
+    unsigned int x = resultID % _numberTilesX;
+    unsigned int y = resultID / _numberTilesX;
+
+    SDL_Rect rect = {
+            (int) (x * _tileWidth),
+            (int) (y * _tileHeight),
+            (int) _tileWidth,
+            (int) _tileHeight
+    };
+
+    return rect;
+}
+
+bool TiledMap::Tileset::containsId(unsigned int id) const
+{
+    return !(id < _startId || id > (_startId + _numberTilesX * _numberTilesY));
+}
+
+/*
+  _______   _   _              _   __  __                           _______   _   _          _
+ |__   __| (_) | |            | | |  \/  |                  _   _  |__   __| (_) | |        | |
+    | |     _  | |   ___    __| | | \  / |   __ _   _ __   (_) (_)    | |     _  | |   ___  | |        __ _   _   _    ___   _ __
+    | |    | | | |  / _ \  / _` | | |\/| |  / _` | | '_ \             | |    | | | |  / _ \ | |       / _` | | | | |  / _ \ | '__|
+    | |    | | | | |  __/ | (_| | | |  | | | (_| | | |_) |  _   _     | |    | | | | |  __/ | |____  | (_| | | |_| | |  __/ | |
+    |_|    |_| |_|  \___|  \__,_| |_|  |_|  \__,_| | .__/  (_) (_)    |_|    |_| |_|  \___| |______|  \__,_|  \__, |  \___| |_|
+                                                   | |                                                         __/ |
+                                                   |_|                                                        |___/
+ */
 
 TiledMap::TileLayer::TileLayer(ResourceHolder *holder)
 {
@@ -434,12 +473,6 @@ void TiledMap::TileLayer::setTileHeight(unsigned int tileHeight)
 unsigned int TiledMap::TileLayer::tileHeight() const
 {
     return _tileHeight;
-}
-
-bool TiledMap::renderLower(SDL_Renderer *renderer, unsigned int x, unsigned int y)
-{
-    for (unsigned int i=0; i < _tileLayers.size(); i++)
-        _tileLayers[i].render( renderer, x, y );
 }
 
 void TiledMap::TileLayer::render(SDL_Renderer *renderer, unsigned int x, unsigned int y)

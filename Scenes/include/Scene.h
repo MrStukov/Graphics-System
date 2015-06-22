@@ -31,6 +31,7 @@ protected:
 
     SDL_Renderer *_renderer;
     ResourceHolder *_resourceHolder;
+    float _fps;
 
 private:
     bool _loopDone;

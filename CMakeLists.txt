@@ -31,6 +31,8 @@ add_executable(Graphics_System ${SOURCE_FILES}
     Tools/include/TiledMap.h
     Tools/src/Compression.cpp
     Tools/include/Compression.h
-Scenes/src/GameTestScene.cpp Scenes/include/GameTestScene.h)
+    Scenes/src/GameTestScene.cpp
+    Scenes/include/GameTestScene.h
+Tools/include/Colliders.cpp Tools/include/Colliders.h)
 
 target_link_libraries(Graphics_System -lSDL2 -lSDL2_image -lz)

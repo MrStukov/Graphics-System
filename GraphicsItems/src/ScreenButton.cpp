@@ -116,28 +116,40 @@ void ScreenButton::handleEvent(SDL_Event *event)
     switch (event->type)
     {
     case SDL_MOUSEBUTTONDOWN:
+    {
         if (_state == ButtonState_Hover)
-        {
             _state = ButtonState_Pressed;
 
-            if (_callbackFunction)
-                _callbackFunction();
-        }
         break;
+    }
 
     case SDL_MOUSEBUTTONUP:
-        if (_state == ButtonState_Pressed)
-            _state = ButtonState_Released;
-
-    case SDL_MOUSEMOTION:
-        if (event->motion.x > _dstRect.x &&
+    {
+        if (_state == ButtonState_Pressed &&
+            event->motion.x > _dstRect.x &&
             event->motion.x < (_dstRect.x + _dstRect.w) &&
             event->motion.y > _dstRect.y &&
-            event->motion.y < (_dstRect.y + _dstRect.h))
-            _state = ButtonState_Hover;
-        else if (_state == ButtonState_Hover)
-            _state = ButtonState_Released;
+            event->motion.y < (_dstRect.y + _dstRect.h)) if (_callbackFunction)
+            _callbackFunction();
+
+        _state = ButtonState_Released;
         break;
+    }
+
+    case SDL_MOUSEMOTION:
+    {
+        bool inside = event->motion.x > _dstRect.x &&
+                      event->motion.x < (_dstRect.x + _dstRect.w) &&
+                      event->motion.y > _dstRect.y &&
+                      event->motion.y < (_dstRect.y + _dstRect.h);
+
+        if (inside && _state != ButtonState_Pressed)
+            _state = ButtonState_Hover;
+        else if (_state == ButtonState_Released || !inside)
+            _state = ButtonState_Released;
+
+        break;
+    }
     default:
         break;
     }

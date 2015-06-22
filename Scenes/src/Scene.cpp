@@ -20,20 +20,25 @@ void Scene::loop()
     init();
     _loopDone = false;
     unsigned int ticks = 0;
-    unsigned int resultTicks = 0;
+    unsigned int resultTicks = SDL_GetTicks();
+    unsigned int difference = 0;
+    _fps = 60;
     unsigned int expectedTicks = 1000 / 60;
     while (!_loopDone)
     {
-        ticks = SDL_GetTicks();
-
         handleEvents();
         update();
         render();
 
         // Ожидание разницы в кадрах
+        ticks = resultTicks;
         resultTicks = SDL_GetTicks();
+        difference = resultTicks - ticks;
+
+        _fps = (_fps + 1000.0f / difference) / 2;
+        printf("FPS: %f\n", _fps);
         if (expectedTicks > resultTicks)
-            SDL_Delay( expectedTicks - (ticks - resultTicks));
+            SDL_Delay( expectedTicks - difference );
     }
 }
 
