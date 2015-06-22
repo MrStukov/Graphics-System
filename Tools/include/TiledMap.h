@@ -27,6 +27,9 @@ public:
 
     bool loadMap( const std::string &path);
 
+    bool renderLower(SDL_Renderer* _renderer, unsigned int x, unsigned int y);
+    bool renderUpper(SDL_Renderer* _renderer, unsigned int x, unsigned int y);
+
 private:
     /*
      * Приватные классы.
@@ -52,6 +55,7 @@ private:
 
         SDL_Rect getTileSourceRect( unsigned int id );
         bool containsId( unsigned int id ) const;
+
     private:
         // Длина и ширина тайла
         unsigned int _tileWidth;
@@ -74,7 +78,9 @@ private:
         TileLayer(ResourceHolder *holder=nullptr);
         ~TileLayer();
 
-        bool setData( std::string data, std::vector < TiledMap::Tileset >& tilesets, bool compression=true, bool encoding=true);
+        bool setData( std::string data, bool compression=true, bool encoding=true);
+
+        void render( SDL_Renderer *renderer, unsigned int x, unsigned int y );
 
         void clear();
 
@@ -97,6 +103,9 @@ private:
         void setTileHeight( unsigned int tileHeight );
         unsigned int tileHeight() const;
 
+        void setTilesets( std::vector < TiledMap::Tileset > *tilesets );
+        std::vector < TiledMap::Tileset > *tilesets() const;
+
     private:
         struct TileData
         {
@@ -109,8 +118,9 @@ private:
 
         unsigned int _width;
         unsigned int _height;
-        ResourceHolder *_resourceHolder;
 
+        ResourceHolder *_resourceHolder;
+        std::vector < Tileset > *_tilesets;
 
         std::vector < TileData > _data;
     };
@@ -135,6 +145,11 @@ private:
     /*
      * Приватные члены.
      */
+    unsigned int _xSize;
+    unsigned int _ySize;
+
+    unsigned int _tileWidth;
+    unsigned int _tileHeight;
 
     std::vector < TiledMap::Tileset> _tilesets;
     std::vector < TiledMap::TileLayer > _tileLayers;

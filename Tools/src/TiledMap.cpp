@@ -41,6 +41,14 @@ bool TiledMap::Tileset::loadImage(const std::string &path)
 
     _texture = _resourceHolder->loadTexture(path);
 
+    int width = 0;
+    int height = 0;
+
+    SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
+
+    _numberTilesX = width / _tileWidth;
+    _numberTilesY = height / _tileHeight;
+
     return true;
 }
 
@@ -51,8 +59,19 @@ SDL_Texture *TiledMap::Tileset::texture() const
 
 SDL_Rect TiledMap::Tileset::getTileSourceRect(unsigned int id)
 {
-    // TODO: Добавить реализацию
-    return SDL_Rect();
+    unsigned int resultID = id - _startId;
+
+    unsigned int x = resultID % _numberTilesX;
+    unsigned int y = resultID / _numberTilesX;
+
+    SDL_Rect rect = {
+            (int) (x * _tileWidth),
+            (int) (y * _tileHeight),
+            (int) _tileWidth,
+            (int) _tileHeight
+    };
+
+    return rect;
 }
 
 bool TiledMap::Tileset::containsId(unsigned int id) const
@@ -63,11 +82,21 @@ bool TiledMap::Tileset::containsId(unsigned int id) const
 TiledMap::TiledMap()
 {
     _resourceHolder = nullptr;
+    _xSize = 0;
+    _ySize = 0;
+    _tileWidth = 0;
+    _tileHeight = 0;
 }
 
 TiledMap::TiledMap(std::string const &path, ResourceHolder *holder)
 {
     // TODO: Заменить printf на logger
+    _xSize = 0;
+    _ySize = 0;
+
+    _tileWidth = 0;
+    _tileHeight = 0;
+
     setResourceHolder(holder);
     if (!loadMap(path))
         printf("[TiledMap::TiledMap] Error: Can't load map.\n");
@@ -148,6 +177,13 @@ bool TiledMap::loadingParsing(const std::string &data)
         return false;
     }
 
+    // Обработка метаданных
+    if (!processMapMetadata( mapElement ))
+    {
+        printf("[TiledMap::loadingParsing] Error: Can't load map metadata.\n");
+        return false;
+    }
+
     // Заргузка тайлсетов
     tinyxml2::XMLElement *tilesetElement = mapElement->FirstChildElement("tileset");
     while (tilesetElement)
@@ -180,7 +216,11 @@ bool TiledMap::loadingParsing(const std::string &data)
 
 bool TiledMap::processMapMetadata(tinyxml2::XMLElement *mapNode)
 {
-    // TODO: Добавить обработку метаданных.
+    _xSize = (unsigned int) atoi( mapNode->Attribute("width") );
+    _ySize = (unsigned int) atoi( mapNode->Attribute("height") );
+
+    _tileWidth = (unsigned int) atoi( mapNode->Attribute("tilewidth") );
+    _tileHeight = (unsigned int) atoi( mapNode->Attribute("tileheight") );
     return true;
 }
 
@@ -200,8 +240,6 @@ bool TiledMap::processTileset(tinyxml2::XMLElement *tilesetNode)
         return false;
     }
 
-
-    // TODO: Добавить стандартный аргумент для source.
     _tilesets.push_back( Tileset(
         imageNode->Attribute("source"),
         (unsigned int) atoi(tilesetNode->Attribute("tilewidth")),
@@ -240,8 +278,13 @@ bool TiledMap::processTileLayer(tinyxml2::XMLElement *tileLayerNode)
             (unsigned int) atoi(tileLayerNode->Attribute("width")),
             (unsigned int) atoi(tileLayerNode->Attribute("height"))
     );
+    layer.setTileSize(
+            _tileWidth,
+            _tileHeight
+    );
+    layer.setTilesets( &_tilesets );
 
-    if (!layer.setData(dataNode->GetText(), _tilesets, compression, encoding))
+    if (!layer.setData(dataNode->GetText(), compression, encoding))
     {
         printf("[TiledMap::processTileLayer] Error: Can't proceed layer data of layer: %s\n",
                tileLayerNode->Attribute("name"));
@@ -284,9 +327,14 @@ void TiledMap::TileLayer::clear()
     _data.clear();
 }
 
-bool TiledMap::TileLayer::setData(std::string data, std::vector<TiledMap::Tileset> &tilesets, bool compression,
-                                  bool encoding)
+bool TiledMap::TileLayer::setData(std::string data, bool compression, bool encoding)
 {
+    if (!_tilesets)
+    {
+        printf("[TileLayer::setData] Error: Can't set data. No tileset set.\n");
+        return false;
+    }
+
     // Очистка данных.
     data.erase(std::remove(data.begin(), data.end(), ' '), data.end());
     data.erase(std::remove(data.begin(), data.end(), '\n'), data.end());
@@ -324,8 +372,8 @@ bool TiledMap::TileLayer::setData(std::string data, std::vector<TiledMap::Tilese
 
         // Поиск правильного тайлсета
         unsigned int i=0;
-        for (std::vector < TiledMap::Tileset >::iterator iterator = tilesets.begin();
-             iterator != tilesets.end();
+        for (std::vector < TiledMap::Tileset >::iterator iterator = _tilesets->begin();
+             iterator != _tilesets->end();
              iterator++, i++)
             if ((*iterator).containsId(byte))
                 tileData.tilesetIndex = i;
@@ -386,4 +434,44 @@ void TiledMap::TileLayer::setTileHeight(unsigned int tileHeight)
 unsigned int TiledMap::TileLayer::tileHeight() const
 {
     return _tileHeight;
+}
+
+bool TiledMap::renderLower(SDL_Renderer *renderer, unsigned int x, unsigned int y)
+{
+    for (unsigned int i=0; i < _tileLayers.size(); i++)
+        _tileLayers[i].render( renderer, x, y );
+}
+
+void TiledMap::TileLayer::render(SDL_Renderer *renderer, unsigned int x, unsigned int y)
+{
+    for (unsigned int iy = 0; iy < _height; iy++)
+        for (unsigned int ix = 0; ix < _width; ix++)
+        {
+            TileData data = _data[iy * _width + ix];
+            Tileset tileset = _tilesets->operator[](data.tilesetIndex);
+            SDL_Rect destignationRect = {
+                    (int) (x + ix * _tileWidth),
+                    (int) (y + iy * _tileHeight),
+                    (int) _tileWidth,
+                    (int) _tileHeight
+            };
+            SDL_Rect sourceRect = tileset.getTileSourceRect(data.id);
+            if (SDL_RenderCopy(renderer, tileset.texture(), &sourceRect, &destignationRect))
+            {
+                printf("[TileLayer::render] Error: Can't render tile (ID: %d)\n"
+                               "   Error: %s\n",
+                       data.id, SDL_GetError());
+                return;
+            }
+        }
+}
+
+void TiledMap::TileLayer::setTilesets(std::vector<TiledMap::Tileset> *tilesets)
+{
+    _tilesets = tilesets;
+}
+
+std::vector<TiledMap::Tileset> *TiledMap::TileLayer::tilesets() const
+{
+    return _tilesets;
 }

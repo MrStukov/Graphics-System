@@ -78,7 +78,9 @@ void MainMenuScene::init()
 void MainMenuScene::functionLoadTestMap()
 {
     GameTestScene scene;
+
     scene.setResourceHolder(_resourceHolder);
+    scene.setRenderer(_renderer);
 
     scene.loop();
 }

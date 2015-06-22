@@ -133,8 +133,7 @@ void ScreenButton::handleEvent(SDL_Event *event)
         if (event->motion.x > _dstRect.x &&
             event->motion.x < (_dstRect.x + _dstRect.w) &&
             event->motion.y > _dstRect.y &&
-            event->motion.y < (_dstRect.y + _dstRect.h) &&
-            _state != ButtonState_Pressed)
+            event->motion.y < (_dstRect.y + _dstRect.h))
             _state = ButtonState_Hover;
         else if (_state == ButtonState_Hover)
             _state = ButtonState_Released;

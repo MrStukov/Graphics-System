@@ -19,11 +19,21 @@ void Scene::loop()
 {
     init();
     _loopDone = false;
+    unsigned int ticks = 0;
+    unsigned int resultTicks = 0;
+    unsigned int expectedTicks = 1000 / 60;
     while (!_loopDone)
     {
+        ticks = SDL_GetTicks();
+
         handleEvents();
         update();
         render();
+
+        // Ожидание разницы в кадрах
+        resultTicks = SDL_GetTicks();
+        if (expectedTicks > resultTicks)
+            SDL_Delay( expectedTicks - (ticks - resultTicks));
     }
 }
 

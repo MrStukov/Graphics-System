@@ -11,7 +11,11 @@ GameTestScene::GameTestScene()
 
 void GameTestScene::render()
 {
-    Scene::render();
+    SDL_RenderClear( _renderer );
+
+    map.renderLower( _renderer, 0, 0 );
+
+    SDL_RenderPresent( _renderer );
 }
 
 void GameTestScene::update()
@@ -22,6 +26,18 @@ void GameTestScene::update()
 void GameTestScene::handleEvents()
 {
     Scene::handleEvents();
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_QUIT:
+                stop();
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void GameTestScene::init()

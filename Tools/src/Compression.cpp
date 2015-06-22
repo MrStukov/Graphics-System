@@ -89,7 +89,7 @@ char* Compression::base64Encode(char const *data, int len, int *resultLen, bool 
             char_array_4[2] = (unsigned char) (((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6));
             char_array_4[3] = (unsigned char) (char_array_3[2] & 0x3f);
 
-            for(i = 0; (i <4) ; i++)
+            for(i = 0; i <4; i++)
                 ret += data[char_array_4[i]];
             i = 0;
         }
@@ -105,10 +105,10 @@ char* Compression::base64Encode(char const *data, int len, int *resultLen, bool 
         char_array_4[2] = (unsigned char) (((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6));
         char_array_4[3] = (unsigned char) (char_array_3[2] & 0x3f);
 
-        for (j = 0; (j < i + 1); j++)
+        for (j = 0; j < i + 1; j++)
             ret += base64_chars[char_array_4[j]];
 
-        while((i++ < 3))
+        while(i++ < 3)
             ret += '=';
 
     }
@@ -146,7 +146,7 @@ char* Compression::base64Decode(char const *data, int len, int *resultLen, bool 
             char_array_3[1] = (unsigned char) (((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2));
             char_array_3[2] = (unsigned char) (((char_array_4[2] & 0x3) << 6) + char_array_4[3]);
 
-            for (i = 0; (i < 3); i++)
+            for (i = 0; i < 3; i++)
                 ret += char_array_3[i];
             i = 0;
         }
@@ -164,7 +164,7 @@ char* Compression::base64Decode(char const *data, int len, int *resultLen, bool 
         char_array_3[1] = (unsigned char) (((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2));
         char_array_3[2] = (unsigned char) (((char_array_4[2] & 0x3) << 6) + char_array_4[3]);
 
-        for (j = 0; (j < i - 1); j++)
+        for (j = 0; j < i - 1; j++)
             ret += char_array_3[j];
     }
 
