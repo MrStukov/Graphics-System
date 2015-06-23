@@ -8,6 +8,8 @@
 #include <SDL2/SDL.h>
 #include "ResourceHolder.h"
 
+// TODO: Изменить Scene api.
+// TODO: Добавить класс мыши.
 class Scene
 {
 public:

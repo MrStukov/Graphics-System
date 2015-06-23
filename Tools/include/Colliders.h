@@ -5,36 +5,27 @@
 #ifndef GRAPHICS_SYSTEM_COLLIDERS_H
 #define GRAPHICS_SYSTEM_COLLIDERS_H
 
-
 namespace Colliders
 {
-    class Rectangle
+    struct Rectangle
     {
-    public:
-        Rectangle();
-        Rectangle( int x, int y, unsigned int w, unsigned int h);
-        ~Rectangle();
-
-        void setPosition( int x, int y );
-
-        int x() const;
-        int y() const;
-
-        void setSize (unsigned int w, unsigned int h);
-
-        unsigned int width() const;
-        unsigned int height() const;
+        int x;
+        int y;
+        unsigned int width;
+        unsigned int height;
 
         bool operator==(const Rectangle &b) const;
-        
-    private:
-        int _x;
-        int _y;
-        unsigned int _width;
-        unsigned int _height;
     };
 
-    bool isColliding( const Rectangle& a, const Rectangle& b);
+    struct Point
+    {
+        int x;
+        int y;
+    };
+
+    bool isColliding( const Rectangle& a, const Rectangle &b );
+    bool isColliding( const Rectangle& a, const Point &b );
+    bool isColliding( const Point &a, const Rectangle &b );
 };
 
 
