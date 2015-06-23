@@ -38,25 +38,12 @@ void MainMenuScene::update()
     Scene::update();
 }
 
-void MainMenuScene::handleEvents()
+void MainMenuScene::handleEvent( const SDL_Event &event )
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        for (std::vector < ScreenButton >::iterator iterator = _buttons.begin();
-             iterator != _buttons.end();
-             iterator++)
-            iterator->handleEvent(&event);
-
-        switch (event.type)
-        {
-            case SDL_QUIT:
-                stop();
-                break;
-            default:
-                break;
-        }
-    }
+    for (std::vector < ScreenButton >::iterator iterator = _buttons.begin();
+         iterator != _buttons.end();
+         iterator++)
+        iterator->handleEvent(event);
 }
 
 void MainMenuScene::functionExit()

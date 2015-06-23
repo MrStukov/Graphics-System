@@ -17,7 +17,7 @@ public:
 protected:
     void render() override;
     void update() override;
-    void handleEvents() override;
+    void handleEvent( const SDL_Event &event) override;
 
     virtual void init() override;
 

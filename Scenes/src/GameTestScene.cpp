@@ -23,21 +23,9 @@ void GameTestScene::update()
     Scene::update();
 }
 
-void GameTestScene::handleEvents()
+void GameTestScene::handleEvent( const SDL_Event &event )
 {
-    Scene::handleEvents();
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-            case SDL_QUIT:
-                stop();
-                break;
-            default:
-                break;
-        }
-    }
+
 }
 
 void GameTestScene::init()

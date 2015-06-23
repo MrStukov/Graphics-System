@@ -35,7 +35,7 @@ public:
     int y() const;
 
     void render();
-    void handleEvent(SDL_Event *event);
+    void handleEvent(const SDL_Event &event);
 
     void setCallback( std::function<void()> function );
 

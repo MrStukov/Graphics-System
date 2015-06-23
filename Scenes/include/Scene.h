@@ -8,11 +8,39 @@
 #include <SDL2/SDL.h>
 #include "ResourceHolder.h"
 
-// TODO: Изменить Scene api.
-// TODO: Добавить класс мыши.
 class Scene
 {
 public:
+    class MouseHolder
+    {
+    friend class Scene;
+
+    public:
+        MouseHolder();
+        ~MouseHolder();
+
+        int xDelta() const;
+        int yDelta() const;
+
+        int x() const;
+        int y() const;
+
+        bool isButtonPressed(int button);
+
+    private:
+        void updateState(int x, int y);
+        void buttonPressed(int button);
+        void buttonReleased(int button);
+
+        std::vector < int > _pressedButtons;
+
+        int _currentX;
+        int _currentY;
+
+        int _lastX;
+        int _lastY;
+    };
+
     Scene(SDL_Renderer *renderer=nullptr);
     virtual ~Scene();
 
@@ -24,19 +52,26 @@ public:
 
     void setResourceHolder( ResourceHolder *resourceHolder );
     ResourceHolder *resourceHolder() const;
+
 protected:
     virtual void init();
-
     virtual void update();
     virtual void render();
-    virtual void handleEvents();
+    virtual void handleEvent( const SDL_Event &event );
+
+    const MouseHolder &mouseHolder() const;
 
     SDL_Renderer *_renderer;
     ResourceHolder *_resourceHolder;
     float _fps;
 
 private:
+    void handleEvents();
+    void handleSystemEvents( const SDL_Event &event );
+
     bool _loopDone;
+
+    MouseHolder _mouseHolder;
 };
 
 

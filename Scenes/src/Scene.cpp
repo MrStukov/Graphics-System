@@ -36,7 +36,7 @@ void Scene::loop()
         difference = resultTicks - ticks;
 
         _fps = (_fps + 1000.0f / difference) / 2;
-        printf("FPS: %f\n", _fps);
+//        printf("FPS: %f\n", _fps);
         if (expectedTicks > resultTicks)
             SDL_Delay( expectedTicks - difference );
     }
@@ -54,7 +54,15 @@ void Scene::render()
 
 void Scene::handleEvents()
 {
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        // Перегружаемая
+        handleEvent(event);
 
+        // Не перегружаемая
+        handleSystemEvents(event);
+    }
 }
 
 void Scene::setRenderer(SDL_Renderer *renderer)
@@ -85,4 +93,100 @@ ResourceHolder *Scene::resourceHolder() const
 void Scene::init()
 {
 
+}
+
+Scene::MouseHolder const &Scene::mouseHolder() const
+{
+    return _mouseHolder;
+}
+
+void Scene::handleEvent(const SDL_Event &event)
+{
+
+}
+
+void Scene::handleSystemEvents(const SDL_Event &event)
+{
+    // TODO: Добавить обработку клавиатуры и мыши
+    switch (event.type)
+    {
+    case SDL_QUIT:
+        exit(0);
+        break;
+
+    case SDL_MOUSEMOTION:
+        _mouseHolder.updateState(event.motion.x, event.motion.y);
+        break;
+
+    case SDL_MOUSEBUTTONDOWN:
+        _mouseHolder.buttonPressed(event.button.button);
+        break;
+
+    case SDL_MOUSEBUTTONUP:
+        _mouseHolder.buttonReleased(event.button.button);
+        break;
+
+    default:
+        break;
+    }
+}
+
+// MOUSE
+Scene::MouseHolder::MouseHolder()
+{
+    _currentX = 0;
+    _currentY = 0;
+}
+
+Scene::MouseHolder::~MouseHolder()
+{
+
+}
+
+void Scene::MouseHolder::updateState(int x, int y)
+{
+    _lastX = _currentX;
+    _lastY = _currentY;
+
+    _currentX = x;
+    _currentY = y;
+}
+
+int Scene::MouseHolder::xDelta() const
+{
+    return _lastX - _currentX;
+}
+
+int Scene::MouseHolder::yDelta() const
+{
+    return _lastY - _currentY;
+}
+
+int Scene::MouseHolder::x() const
+{
+    return _currentX;
+}
+
+int Scene::MouseHolder::y() const
+{
+    return _currentY;
+}
+
+void Scene::MouseHolder::buttonPressed(int button)
+{
+    std::vector<int>::iterator pos = std::find(_pressedButtons.begin(), _pressedButtons.end(), button);
+    if (pos == _pressedButtons.end())
+        _pressedButtons.push_back(button);
+}
+
+void Scene::MouseHolder::buttonReleased(int button)
+{
+    std::vector<int>::iterator pos = std::find(_pressedButtons.begin(), _pressedButtons.end(), button);
+    if (pos != _pressedButtons.end())
+        _pressedButtons.erase(pos);
+}
+
+bool Scene::MouseHolder::isButtonPressed(int button)
+{
+    return std::find(_pressedButtons.begin(), _pressedButtons.end(), button) != _pressedButtons.end();
 }
