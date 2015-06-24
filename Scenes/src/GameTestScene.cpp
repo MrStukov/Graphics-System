@@ -11,11 +11,11 @@ GameTestScene::GameTestScene()
 
 void GameTestScene::render()
 {
-    SDL_RenderClear( _renderer );
+    SDL_RenderClear( renderer() );
 
-    map.renderLower( _renderer, 0, 0 );
+    map.renderLower( renderer(), 0, 0 );
 
-    SDL_RenderPresent( _renderer );
+    SDL_RenderPresent( renderer() );
 }
 
 void GameTestScene::update()
@@ -30,6 +30,6 @@ void GameTestScene::handleEvent( const SDL_Event &event )
 
 void GameTestScene::init()
 {
-    map.setResourceHolder(_resourceHolder);
+    map.setResourceHolder( resourceHolder() );
     map.loadMap("maps/test.tmx");
 }

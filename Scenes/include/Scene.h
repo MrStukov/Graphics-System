@@ -7,6 +7,7 @@
 
 #include <SDL2/SDL.h>
 #include "ResourceHolder.h"
+#include <map>
 
 class Scene
 {
@@ -25,7 +26,7 @@ public:
         int x() const;
         int y() const;
 
-        bool isButtonPressed(int button);
+        bool isButtonPressed(int button) const;
 
     private:
         void updateState(int x, int y);
@@ -41,7 +42,25 @@ public:
         int _lastY;
     };
 
+    class KeyboardHolder
+    {
+    friend class Scene;
+
+    public:
+        KeyboardHolder();
+        ~KeyboardHolder();
+
+        bool isKeyPressed( int key ) const;
+
+    private:
+        void keyPressed(int key);
+        void keyReleased(int key);
+
+        std::vector < int > _pressedKeys;
+    };
+
     Scene(SDL_Renderer *renderer=nullptr);
+    Scene( Scene *parent );
     virtual ~Scene();
 
     void loop();
@@ -60,9 +79,8 @@ protected:
     virtual void handleEvent( const SDL_Event &event );
 
     const MouseHolder &mouseHolder() const;
+    const KeyboardHolder &keyboardHolder() const;
 
-    SDL_Renderer *_renderer;
-    ResourceHolder *_resourceHolder;
     float _fps;
 
 private:
@@ -72,6 +90,10 @@ private:
     bool _loopDone;
 
     MouseHolder _mouseHolder;
+    KeyboardHolder _keyboardHolder;
+
+    SDL_Renderer *_renderer;
+    ResourceHolder *_resourceHolder;
 };
 
 

@@ -33,6 +33,12 @@ add_executable(Graphics_System ${SOURCE_FILES}
     Tools/include/Compression.h
     Scenes/src/GameTestScene.cpp
     Scenes/include/GameTestScene.h
-Tools/src/Colliders.cpp Tools/include/Colliders.h)
+    Tools/src/Colliders.cpp
+    Tools/include/Colliders.h
+    Tools/src/Camera.cpp
+    Tools/include/Camera.h
+    Tools/include/Vector2.h
+    Tools/src/Vector2.cpp
+)
 
 target_link_libraries(Graphics_System -lSDL2 -lSDL2_image -lz)

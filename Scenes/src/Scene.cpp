@@ -1,6 +1,4 @@
 //
-// Created by megaxela on 16.06.15.
-//
 
 #include "Scene.h"
 
@@ -8,6 +6,14 @@ Scene::Scene(SDL_Renderer *renderer)
 {
     _renderer = renderer;
     _loopDone = false;
+}
+
+//
+// Created by megaxela on 16.06.15.
+Scene::Scene(Scene *parent)
+{
+    _renderer = parent->_renderer;
+    _resourceHolder = parent->_resourceHolder;
 }
 
 Scene::~Scene()
@@ -100,6 +106,11 @@ Scene::MouseHolder const &Scene::mouseHolder() const
     return _mouseHolder;
 }
 
+Scene::KeyboardHolder const &Scene::keyboardHolder() const
+{
+    return _keyboardHolder;
+}
+
 void Scene::handleEvent(const SDL_Event &event)
 {
 
@@ -124,6 +135,14 @@ void Scene::handleSystemEvents(const SDL_Event &event)
 
     case SDL_MOUSEBUTTONUP:
         _mouseHolder.buttonReleased(event.button.button);
+        break;
+
+    case SDL_KEYDOWN:
+        _keyboardHolder.keyPressed( event.key.keysym.sym );
+        break;
+
+    case SDL_KEYUP:
+        _keyboardHolder.keyReleased( event.key.keysym.sym );
         break;
 
     default:
@@ -174,19 +193,77 @@ int Scene::MouseHolder::y() const
 
 void Scene::MouseHolder::buttonPressed(int button)
 {
-    std::vector<int>::iterator pos = std::find(_pressedButtons.begin(), _pressedButtons.end(), button);
+    std::vector<int>::iterator pos = std::find(
+            _pressedButtons.begin(),
+            _pressedButtons.end(),
+            button
+    );
+
     if (pos == _pressedButtons.end())
         _pressedButtons.push_back(button);
 }
 
 void Scene::MouseHolder::buttonReleased(int button)
 {
-    std::vector<int>::iterator pos = std::find(_pressedButtons.begin(), _pressedButtons.end(), button);
+    std::vector<int>::iterator pos = std::find(
+            _pressedButtons.begin(),
+            _pressedButtons.end(),
+            button
+    );
+
     if (pos != _pressedButtons.end())
         _pressedButtons.erase(pos);
 }
 
-bool Scene::MouseHolder::isButtonPressed(int button)
+bool Scene::MouseHolder::isButtonPressed(int button) const
 {
-    return std::find(_pressedButtons.begin(), _pressedButtons.end(), button) != _pressedButtons.end();
+    return std::find(
+            _pressedButtons.begin(),
+            _pressedButtons.end(),
+            button
+    ) != _pressedButtons.end();
+}
+
+// KEYBOARD
+Scene::KeyboardHolder::KeyboardHolder()
+{
+
+}
+
+Scene::KeyboardHolder::~KeyboardHolder()
+{
+
+}
+
+bool Scene::KeyboardHolder::isKeyPressed(int key) const
+{
+    return std::find(
+            _pressedKeys.begin(),
+            _pressedKeys.end(),
+            key
+    ) != _pressedKeys.end();
+}
+
+void Scene::KeyboardHolder::keyPressed(int key)
+{
+    std::vector<int>::iterator pos = std::find(
+            _pressedKeys.begin(),
+            _pressedKeys.end(),
+            key
+    );
+
+    if (pos != _pressedKeys.end())
+        _pressedKeys.push_back(key);
+}
+
+void Scene::KeyboardHolder::keyReleased(int key)
+{
+    std::vector<int>::iterator pos = std::find(
+            _pressedKeys.begin(),
+            _pressedKeys.end(),
+            key
+    );
+
+    if (pos != _pressedKeys.end())
+        _pressedKeys.erase(pos);
 }

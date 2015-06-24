@@ -117,7 +117,6 @@ void ScreenButton::handleEvent(const SDL_Event &event)
     {
     case SDL_MOUSEBUTTONDOWN:
     {
-        printf("Event button: %d\n", event.button.button);
         if (_state == ButtonState_Hover)
             _state = ButtonState_Pressed;
 

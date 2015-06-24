@@ -9,28 +9,24 @@ MainMenuScene::MainMenuScene() :
     Scene()
 {
     _buttons.push_back(
-            ScreenButton(nullptr, _renderer, 10, 10,
+            ScreenButton(nullptr, renderer(), 10, 10,
                          std::bind(&MainMenuScene::functionExit, this))
     );
 
     _buttons.push_back(
-            ScreenButton(nullptr, _renderer, 10, 120,
+            ScreenButton(nullptr, renderer(), 10, 120,
                          std::bind(&MainMenuScene::functionLoadTestMap, this))
     );
 }
 
 void MainMenuScene::render()
 {
-    SDL_RenderClear(_renderer);
-
-//    std::for_each( _buttons.begin(), _buttons.end(), std::mem_fun_ref(&ScreenButton::render));
+    SDL_RenderClear(renderer());
 
     for (auto button : _buttons)
-    {
         button.render();
-    }
 
-    SDL_RenderPresent(_renderer);
+    SDL_RenderPresent(renderer());
 }
 
 void MainMenuScene::update()
@@ -56,18 +52,18 @@ void MainMenuScene::init()
     for (std::vector < ScreenButton >::iterator iterator = _buttons.begin();
          iterator != _buttons.end();
          iterator++)
-        iterator->setRenderer(_renderer);
+        iterator->setRenderer(renderer());
 
-    _buttons[0].setTexture( _resourceHolder->loadTexture("images/test_button.png"));
-    _buttons[1].setTexture( _resourceHolder->loadTexture("images/test_button.png"));
+    _buttons[0].setTexture( resourceHolder()->loadTexture("images/test_button.png"));
+    _buttons[1].setTexture( resourceHolder()->loadTexture("images/test_button.png"));
 }
 
 void MainMenuScene::functionLoadTestMap()
 {
     GameTestScene scene;
 
-    scene.setResourceHolder(_resourceHolder);
-    scene.setRenderer(_renderer);
+    scene.setResourceHolder(resourceHolder());
+    scene.setRenderer(renderer());
 
     scene.loop();
 }
