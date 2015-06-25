@@ -25,7 +25,7 @@ Camera::Camera(const Vector2 &position)
     _previousPosition = position;
 
     _linearIterations = 0;
-    _linearStep = 0.01f;
+    _linearStep = 0.1f;
 
     _movingType = CameraMovingType_Linear;
 }
@@ -56,7 +56,7 @@ void Camera::setTargetPosition(const Vector2 &position)
     _targetPosition = position;
 }
 
-void Camera::udpate(float deltaTime)
+void Camera::update()
 {
     switch (_movingType)
     {
@@ -64,8 +64,15 @@ void Camera::udpate(float deltaTime)
         _currentPosition.LerpTo(_targetPosition, 0.1f);
         break;
     case CameraMovingType_Linear:
-        _linearIterations += _linearStep;
-        _currentPosition = Vector2::Lerp(_previousPosition, _targetPosition, _linearIterations);
+        if (_linearIterations < 1)
+        {
+            _linearIterations += _linearStep;
+            _currentPosition = Vector2::Lerp(
+                    _previousPosition,
+                    _targetPosition,
+                    _linearIterations
+            );
+        }
         break;
     case CameraMovingType_Moment:
         _currentPosition = _targetPosition;

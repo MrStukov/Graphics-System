@@ -27,8 +27,8 @@ public:
 
     bool loadMap( const std::string &path);
 
-    bool renderLower(SDL_Renderer* _renderer, unsigned int x, unsigned int y);
-    bool renderUpper(SDL_Renderer* _renderer, unsigned int x, unsigned int y);
+    bool renderLower(SDL_Renderer* _renderer, int x, int y);
+    bool renderUpper(SDL_Renderer* _renderer, int x, int y);
 
 private:
     /*
@@ -80,7 +80,7 @@ private:
 
         bool setData( std::string data, bool compression=true, bool encoding=true);
 
-        void render( SDL_Renderer *renderer, unsigned int x, unsigned int y );
+        void render( SDL_Renderer *renderer, int x, int y );
 
         void clear();
 

@@ -34,7 +34,7 @@ TiledMap::TiledMap(std::string const &path, ResourceHolder *holder)
 
     setResourceHolder(holder);
     if (!loadMap(path))
-        printf("[TiledMap::TiledMap] Error: Can't load map.\n");
+        printf("[TiledMap::TiledMap] Error: Can't load _map.\n");
 }
 
 TiledMap::~TiledMap()
@@ -57,20 +57,20 @@ bool TiledMap::loadMap(const std::string &path)
     std::string fileData = loadingOpeningFile(path);
     if (fileData.length() <= 0)
     {
-        printf("[TiledMap::loadMap] Error: Can't open map file.\n");
+        printf("[TiledMap::loadMap] Error: Can't open _map file.\n");
         return false;
     }
 
     std::string decodedFile = loadingDecoding(fileData);
     if (decodedFile.length() <= 0)
     {
-        printf("[TiledMap::loadMap] Error: Can't decode map file.\n");
+        printf("[TiledMap::loadMap] Error: Can't decode _map file.\n");
         return false;
     }
 
     bool parsingResult = loadingParsing( decodedFile );
     if (!parsingResult)
-        printf("[TiledMap::loadMap] Error: Can't parse map file.\n");
+        printf("[TiledMap::loadMap] Error: Can't parse _map file.\n");
 
     return parsingResult;
 }
@@ -108,7 +108,7 @@ bool TiledMap::loadingParsing(const std::string &data)
     tinyxml2::XMLElement *mapElement = document.FirstChildElement("map");
     if (!mapElement)
     {
-        printf("[TiledMap::loadingParsing] Error: Can't get map node.\n");
+        printf("[TiledMap::loadingParsing] Error: Can't get_map node.\n");
         return false;
     }
 
@@ -231,7 +231,7 @@ bool TiledMap::processTileLayer(tinyxml2::XMLElement *tileLayerNode)
     return true;
 }
 
-bool TiledMap::renderLower(SDL_Renderer *renderer, unsigned int x, unsigned int y)
+bool TiledMap::renderLower(SDL_Renderer *renderer, int x, int y)
 {
     for (unsigned int i=0; i < _tileLayers.size(); i++)
         _tileLayers[i].render( renderer, x, y );
@@ -393,7 +393,7 @@ bool TiledMap::TileLayer::setData(std::string data, bool compression, bool encod
 
     if (_width * _height * 4 != length)
     {
-        printf("[TileLayer::setData] Error: Data size is not equal with map size. %d * 4 != %d\n",
+        printf("[TileLayer::setData] Error: Data size is not equal with _map size. %d * 4 != %d\n",
                _width * _height, length);
         return false;
     }
@@ -475,7 +475,7 @@ unsigned int TiledMap::TileLayer::tileHeight() const
     return _tileHeight;
 }
 
-void TiledMap::TileLayer::render(SDL_Renderer *renderer, unsigned int x, unsigned int y)
+void TiledMap::TileLayer::render(SDL_Renderer *renderer, int x, int y)
 {
     for (unsigned int iy = 0; iy < _height; iy++)
         for (unsigned int ix = 0; ix < _width; ix++)

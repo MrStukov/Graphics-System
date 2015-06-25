@@ -7,6 +7,7 @@
 
 
 #include <TiledMap.h>
+#include <Camera.h>
 #include "Scene.h"
 
 class GameTestScene : public Scene
@@ -22,7 +23,8 @@ protected:
     virtual void init() override;
 
 private:
-    TiledMap map;
+    TiledMap _map;
+    Camera _camera;
 };
 
 

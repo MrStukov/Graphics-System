@@ -32,7 +32,7 @@ public:
 
     void setMovingType( CameraMovingType type );
 
-    void udpate( float deltaTime );
+    void update();
 private:
     CameraMovingType _movingType;
 
