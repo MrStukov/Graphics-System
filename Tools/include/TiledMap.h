@@ -12,6 +12,7 @@
 #include "ResourceHolder.h"
 #include "tinyxml2.h"
 #include "Compression.h"
+#include "Colliders.h"
 
 // TODO: Добавить рендер с предусмотрением неполного рендеринга
 
@@ -30,6 +31,7 @@ public:
     bool renderLower(SDL_Renderer* _renderer, int x, int y);
     bool renderUpper(SDL_Renderer* _renderer, int x, int y);
 
+    const Colliders::CollidersHolder &collidersHolder() const;
 private:
     /*
      * Приватные классы.
@@ -129,27 +131,38 @@ private:
      */
 
     /*
-     * Функции закрузки карты.
+     * Методы закрузки карты.
      */
     std::string loadingOpeningFile( const std::string &path);
     std::string loadingDecoding( const std::string &data );
     bool loadingParsing ( const std::string &data );
 
     /*
-     * Функции обработки файла карты
+     * Методы обработки файла карты
      */
     bool processMapMetadata( tinyxml2::XMLElement *mapNode );
     bool processTileset( tinyxml2::XMLElement *tilesetNode );
     bool processTileLayer( tinyxml2::XMLElement *tileLayerNode );
+    bool processObjectLayer( tinyxml2::XMLElement *objectLayerNode );
 
+    /*
+     * Методы обработки слоев с объектами
+     */
+    bool processColliderLayer( tinyxml2::XMLElement *colliderLayerNode );
+
+    std::map < std::string, std::string > readLayerProperties( tinyxml2::XMLElement *layerNode );
     /*
      * Приватные члены.
      */
+    Colliders::CollidersHolder _collidersHolder;
+
     unsigned int _xSize;
     unsigned int _ySize;
 
     unsigned int _tileWidth;
     unsigned int _tileHeight;
+
+    unsigned int _splitLayer;
 
     std::vector < TiledMap::Tileset> _tilesets;
     std::vector < TiledMap::TileLayer > _tileLayers;

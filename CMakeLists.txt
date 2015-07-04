@@ -25,8 +25,6 @@ add_executable(Graphics_System ${SOURCE_FILES}
     Scenes/include/GameTestScene.h
     GraphicsItems/src/ScreenButton.cpp
     GraphicsItems/include/ScreenButton.h
-    GraphicsItems/src/ScreenItem.cpp
-    GraphicsItems/include/ScreenItem.h
     Tools/src/ResourceHolder.cpp
     Tools/include/ResourceHolder.h
     Tools/src/TiledMap.cpp
@@ -41,6 +39,14 @@ add_executable(Graphics_System ${SOURCE_FILES}
     Tools/include/Vector2.h
     Tools/src/Application.cpp
     Tools/include/Application.h
+    LogicItems/src/Player.cpp
+    LogicItems/include/Player.h
+    Tools/src/CameraFollowController.cpp
+    Tools/include/CameraFollowController.h
+    GraphicsItems/src/Entity.cpp
+    GraphicsItems/include/Entity.h
+    Tools/src/SettingsHolder.cpp
+    Tools/include/SettingsHolder.h
 )
 
 target_link_libraries(Graphics_System -lSDL2 -lSDL2_image -lz)

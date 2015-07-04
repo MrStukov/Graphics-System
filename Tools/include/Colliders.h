@@ -5,6 +5,9 @@
 #ifndef GRAPHICS_SYSTEM_COLLIDERS_H
 #define GRAPHICS_SYSTEM_COLLIDERS_H
 
+#include <vector>
+#include <algorithm>
+
 namespace Colliders
 {
     struct Rectangle
@@ -21,6 +24,24 @@ namespace Colliders
     {
         int x;
         int y;
+    };
+
+    class CollidersHolder
+    {
+    // TODO: Добавить разделение на несколько массивов для того, что бы не обрабатывать много данных.
+    public:
+        CollidersHolder();
+        ~CollidersHolder();
+
+        void clear();
+
+        bool isColliding( const Rectangle &a ) const;
+        bool isColliding( const Point &a ) const;
+
+        void addCollider( const Rectangle &rectangle );
+
+    private:
+        std::vector < Colliders::Rectangle > _rectangles;
     };
 
     bool isColliding( const Rectangle& a, const Rectangle &b );

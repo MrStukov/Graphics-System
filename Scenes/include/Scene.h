@@ -5,10 +5,11 @@
 #ifndef GRAPHICS_SYSTEM_SCENE_H
 #define GRAPHICS_SYSTEM_SCENE_H
 
-#include <SDL2/SDL.h>
 #include "ResourceHolder.h"
+#include "SettingsHolder.h"
 #include <map>
 
+// TODO: Добавить комментарии. И почистить код.
 class Scene
 {
 public:
@@ -72,6 +73,9 @@ public:
     void setResourceHolder( ResourceHolder *resourceHolder );
     ResourceHolder *resourceHolder() const;
 
+    void setSettings( SettingsHolder *settingsHolder );
+    SettingsHolder* settings() const;
+
 protected:
     virtual void init();
     virtual void update();
@@ -94,6 +98,7 @@ private:
 
     SDL_Renderer *_renderer;
     ResourceHolder *_resourceHolder;
+    SettingsHolder *_settings;
 };
 
 

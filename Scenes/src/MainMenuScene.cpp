@@ -64,6 +64,7 @@ void MainMenuScene::functionLoadTestMap()
 
     scene.setResourceHolder(resourceHolder());
     scene.setRenderer(renderer());
+    scene.setSettings( settings() );
 
     scene.loop();
 }

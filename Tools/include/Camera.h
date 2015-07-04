@@ -25,12 +25,10 @@ public:
     int y() const;
 
     Vector2 position() const;
-
     void setTargetPosition( const Vector2 &position );
 
-    CameraMovingType movingType() const;
-
     void setMovingType( CameraMovingType type );
+    CameraMovingType movingType() const;
 
     void update();
 private:

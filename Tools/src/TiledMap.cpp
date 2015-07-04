@@ -1,7 +1,3 @@
-//
-// Created by megaxela on 20.06.15.
-//
-
 #include "TiledMap.h"
 /*
   _______   _   _              _   __  __
@@ -21,6 +17,7 @@ TiledMap::TiledMap()
     _ySize = 0;
     _tileWidth = 0;
     _tileHeight = 0;
+    _splitLayer = 0;
 }
 
 TiledMap::TiledMap(std::string const &path, ResourceHolder *holder)
@@ -28,6 +25,8 @@ TiledMap::TiledMap(std::string const &path, ResourceHolder *holder)
     // TODO: Заменить printf на logger
     _xSize = 0;
     _ySize = 0;
+
+    _splitLayer = 0;
 
     _tileWidth = 0;
     _tileHeight = 0;
@@ -145,6 +144,20 @@ bool TiledMap::loadingParsing(const std::string &data)
         tileLayerElement = tileLayerElement->NextSiblingElement("layer");
     }
 
+    // Загрузка слоев с объектами
+    tinyxml2::XMLElement *objectLayerElement = mapElement->FirstChildElement("objectgroup");
+    while (objectLayerElement)
+    {
+        if (!processObjectLayer( objectLayerElement ))
+        {
+            printf("[TiledMap::loadingParsing] Error: Can't load object layer: %s\n",
+                   objectLayerElement->Attribute("name"));
+            return false;
+        }
+
+        objectLayerElement = objectLayerElement->NextSiblingElement("objectgroup");
+    }
+
     // TODO: Закончить обработку файла с картой.
     return true;
 }
@@ -156,6 +169,10 @@ bool TiledMap::processMapMetadata(tinyxml2::XMLElement *mapNode)
 
     _tileWidth = (unsigned int) atoi( mapNode->Attribute("tilewidth") );
     _tileHeight = (unsigned int) atoi( mapNode->Attribute("tileheight") );
+
+    std::map< std::string, std::string > properties = readLayerProperties(mapNode);
+    _splitLayer = (unsigned int) atoi(properties["splitter"].c_str());
+
     return true;
 }
 
@@ -233,8 +250,65 @@ bool TiledMap::processTileLayer(tinyxml2::XMLElement *tileLayerNode)
 
 bool TiledMap::renderLower(SDL_Renderer *renderer, int x, int y)
 {
-    for (unsigned int i=0; i < _tileLayers.size(); i++)
+    for (unsigned int i=0; i < _splitLayer; i++)
         _tileLayers[i].render( renderer, x, y );
+    return true;
+}
+
+
+bool TiledMap::renderUpper(SDL_Renderer *_renderer, int x, int y)
+{
+    for (unsigned int i=_splitLayer; i < _tileLayers.size(); i++)
+        _tileLayers[i].render( _renderer, x, y );
+    return true;
+}
+
+std::map<std::string, std::string> TiledMap::readLayerProperties(tinyxml2::XMLElement *layerNode)
+{
+    std::map<std::string, std::string> result;
+    tinyxml2::XMLElement *propertiesNode = layerNode->FirstChildElement("properties");
+    if (!propertiesNode)
+        return result;
+
+    tinyxml2::XMLElement *propertyNode = propertiesNode->FirstChildElement("property");
+    while (propertyNode)
+    {
+        result[propertyNode->Attribute("name")] = propertyNode->Attribute("value");
+
+        propertyNode = propertyNode->NextSiblingElement("property");
+    }
+
+    return result;
+}
+
+bool TiledMap::processObjectLayer(tinyxml2::XMLElement *objectLayerNode)
+{
+    std::map < std::string, std::string > properties = readLayerProperties(objectLayerNode);
+
+    if (properties["type"] == "colliders")
+        return processColliderLayer( objectLayerNode );
+
+    return true;
+}
+
+
+bool TiledMap::processColliderLayer(tinyxml2::XMLElement *colliderLayerNode)
+{
+    // Обрабатывает только прямоугольники
+    tinyxml2::XMLElement *objectNode = colliderLayerNode->FirstChildElement("object");
+    while (objectNode)
+    {
+        Colliders::Rectangle rectangle;
+        rectangle.x = atoi(objectNode->Attribute("x"));
+        rectangle.y = atoi(objectNode->Attribute("y"));
+        rectangle.width = (unsigned int) atoi(objectNode->Attribute("width"));
+        rectangle.height = (unsigned int) atoi(objectNode->Attribute("height"));
+
+        _collidersHolder.addCollider(rectangle);
+
+        objectNode = objectNode->NextSiblingElement("object");
+    }
+
     return true;
 }
 
@@ -507,4 +581,9 @@ void TiledMap::TileLayer::setTilesets(std::vector<TiledMap::Tileset> *tilesets)
 std::vector<TiledMap::Tileset> *TiledMap::TileLayer::tilesets() const
 {
     return _tilesets;
+}
+
+const Colliders::CollidersHolder &TiledMap::collidersHolder() const
+{
+    return _collidersHolder;
 }

@@ -8,8 +8,19 @@ Application::Application(char const *title, int width, int height)
 {
     _mainScene = nullptr;
     _resourceHolder = nullptr;
+    _settingsHolder = nullptr;
     _ready = true;
-    _window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+
+    _settingsHolder = new SettingsHolder();
+    _window = SDL_CreateWindow(
+            title,
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            _settingsHolder->screenWidth(),
+            _settingsHolder->screenHeight(),
+            SDL_WINDOW_SHOWN
+    );
+
     if (!_window)
     {
         printf("[Application::Application] Error: Can't init window. Error: %s\n", SDL_GetError());
@@ -18,7 +29,11 @@ Application::Application(char const *title, int width, int height)
     }
 
     // TODO: Разобраться с флагами
-    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    _renderer = SDL_CreateRenderer(
+            _window,
+            -1,
+            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+    );
     if (!_renderer)
     {
         printf("[Application::Application] Error: Can't init renderer. Error: %s\n",
@@ -39,6 +54,8 @@ Application::~Application()
         SDL_DestroyRenderer(_renderer);
     if (_resourceHolder)
         delete _resourceHolder;
+    if (_settingsHolder)
+        delete _settingsHolder;
 }
 
 void Application::setMainScene(Scene *scene)
@@ -48,6 +65,7 @@ void Application::setMainScene(Scene *scene)
     {
         _mainScene->setResourceHolder( _resourceHolder );
         _mainScene->setRenderer( _renderer );
+        _mainScene->setSettings( _settingsHolder );
     }
 }
 

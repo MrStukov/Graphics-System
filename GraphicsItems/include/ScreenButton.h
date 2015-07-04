@@ -5,9 +5,8 @@
 #ifndef GRAPHICS_SYSTEM_SCREENBUTTON_H
 #define GRAPHICS_SYSTEM_SCREENBUTTON_H
 
-#include <SDL2/SDL.h>
 #include <functional>
-#include "ScreenItem.h"
+#include "Entity.h"
 
 //TODO: Добавить Collider вместо явной проверки.
 /*
@@ -20,24 +19,27 @@
  *      Hover
  *      Pressed
  */
-class ScreenButton : public ScreenItem
+
+// fixme: Заменить явную передачу координат на Vector2
+class ScreenButton : public Entity
 {
 public:
     ScreenButton();
     ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y, std::function<void()> callback);
     ~ScreenButton();
 
-    void setTexture(SDL_Texture *texture);
-    SDL_Texture *texture() const;
-
     void setPosition(int x, int y);
     int x() const;
     int y() const;
 
     void render();
+
+    // TODO: Добавить поддержку нового API с MouseHolderо.
     void handleEvent(const SDL_Event &event);
 
     void setCallback( std::function<void()> function );
+
+    void setTexture( SDL_Texture *texture );
 
 private:
     enum ButtonState
@@ -50,10 +52,6 @@ private:
     ButtonState _state;
 
     SDL_Rect _dstRect;
-
-    SDL_Texture *_texture;
-    int _textureWidth;
-    int _textureHeight;
 
     std::function<void()> _callbackFunction;
 };

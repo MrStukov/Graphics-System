@@ -6,7 +6,6 @@
 #define GRAPHICS_SYSTEM_APPLICATION_H
 
 #include "Scene.h"
-#include "ResourceHolder.h"
 
 class Application
 {
@@ -20,6 +19,7 @@ public:
     void run();
 private:
     ResourceHolder *_resourceHolder;
+    SettingsHolder *_settingsHolder;
     Scene *_mainScene;
 
     SDL_Window *_window;

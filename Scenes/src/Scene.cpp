@@ -6,6 +6,7 @@ Scene::Scene(SDL_Renderer *renderer)
 {
     _renderer = renderer;
     _loopDone = false;
+    _settings = nullptr;
 }
 
 //
@@ -14,6 +15,7 @@ Scene::Scene(Scene *parent)
 {
     _renderer = parent->_renderer;
     _resourceHolder = parent->_resourceHolder;
+    _settings = parent->_settings;
 }
 
 Scene::~Scene()
@@ -109,6 +111,16 @@ Scene::MouseHolder const &Scene::mouseHolder() const
 Scene::KeyboardHolder const &Scene::keyboardHolder() const
 {
     return _keyboardHolder;
+}
+
+void Scene::setSettings(SettingsHolder *settingsHolder)
+{
+    _settings = settingsHolder;
+}
+
+SettingsHolder *Scene::settings() const
+{
+    return _settings;
 }
 
 void Scene::handleEvent(const SDL_Event &event)
@@ -267,3 +279,4 @@ void Scene::KeyboardHolder::keyReleased(int key)
     if (pos != _pressedKeys.end())
         _pressedKeys.erase(pos);
 }
+

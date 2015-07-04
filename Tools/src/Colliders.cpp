@@ -33,3 +33,48 @@ bool ::Colliders::isColliding(const Colliders::Point &a, const Colliders::Rectan
              (a.x < b.x) ||
              (a.y < b.y));
 }
+
+Colliders::CollidersHolder::CollidersHolder()
+{
+
+}
+
+Colliders::CollidersHolder::~CollidersHolder()
+{
+
+}
+
+bool Colliders::CollidersHolder::isColliding(Colliders::Rectangle const &a) const
+{
+    bool colliding = false;
+    for (std::vector<Colliders::Rectangle>::const_iterator iterator = _rectangles.begin();
+         iterator != _rectangles.end() && !colliding;
+         iterator++)
+        if (Colliders::isColliding((*iterator), a))
+            colliding = true;
+
+    return colliding;
+}
+
+bool Colliders::CollidersHolder::isColliding(Colliders::Point const &a) const
+{
+    bool colliding = false;
+    for (std::vector<Colliders::Rectangle>::const_iterator iterator = _rectangles.begin();
+         iterator != _rectangles.end() && !colliding;
+         iterator++)
+        if (Colliders::isColliding((*iterator), a))
+            colliding = true;
+
+    return colliding;
+}
+
+
+void Colliders::CollidersHolder::addCollider(Colliders::Rectangle const &rectangle)
+{
+    _rectangles.push_back(rectangle);
+}
+
+void Colliders::CollidersHolder::clear()
+{
+    _rectangles.clear();
+}

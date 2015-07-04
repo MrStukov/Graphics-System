@@ -5,14 +5,11 @@
 #include "ScreenButton.h"
 
 ScreenButton::ScreenButton() :
-    ScreenItem( nullptr )
+        Entity( nullptr )
 {
     _callbackFunction = nullptr;
     _state = ButtonState_Released;
-    _texture = nullptr;
 
-    _textureHeight = 0;
-    _textureWidth = 0;
     _dstRect.x = 0;
     _dstRect.y = 0;
     _dstRect.w = 0;
@@ -20,7 +17,7 @@ ScreenButton::ScreenButton() :
 }
 
 ScreenButton::ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y, std::function<void()> callback) :
-    ScreenItem( renderer )
+        Entity( renderer )
 {
     _state = ButtonState_Released;
 
@@ -28,8 +25,8 @@ ScreenButton::ScreenButton(SDL_Texture *texture, SDL_Renderer *renderer, int x, 
 
     _dstRect.x = x;
     _dstRect.y = y;
-    _dstRect.w = _textureWidth;
-    _dstRect.h = _textureHeight;
+    _dstRect.w = width();
+    _dstRect.h = height() / 3;
     _callbackFunction = callback;
 }
 
@@ -41,74 +38,44 @@ ScreenButton::~ScreenButton()
 void ScreenButton::render()
 {
     // TODO: Исправить printf на logger
-    if (!_renderer) //TODO: #1
+    if (!renderer())
         printf("[ScreenButton::render] Error: Renderer was not set.\n");
 
-    if (!_texture) // TODO: #2
+    if (!texture())
         printf("[ScreenButton::render] Error: Texture was not set.\n");
 
-    if (!_renderer || !_texture)
+    if (!renderer() || !texture())
         return;
 
-    int partSize = _textureHeight / 3;
+    int partSize = height() / 3;
     SDL_Rect sourceRect;
 
     switch (_state)
     {
         case ButtonState_Released:
-            sourceRect = {0, 0, _textureWidth, partSize};
-            if (SDL_RenderCopy(_renderer, _texture, &sourceRect, &_dstRect) != 0) // TODO: #3
+            sourceRect = {0, 0, (int) width(), partSize};
+            if (SDL_RenderCopy(renderer(), texture(), &sourceRect, &_dstRect) != 0)
                 printf("[ScreenButton::render] Error: Can't copy texture to renderer. Error: %s\n",
                        SDL_GetError());
             break;
         case ButtonState_Hover:
-            sourceRect = {0, partSize, _textureWidth, partSize};
+            sourceRect = {0, partSize, (int) width(), partSize};
 
-            if (SDL_RenderCopy(_renderer, _texture, &sourceRect, &_dstRect) != 0) // TODO: #4
+            if (SDL_RenderCopy(renderer(), texture(), &sourceRect, &_dstRect) != 0)
                 printf("[ScreenButton::render] Error: Can't copy texture to renderer. Error: %s\n",
                        SDL_GetError());
             break;
         case ButtonState_Pressed:
-            sourceRect = {0, partSize * 2, _textureWidth, partSize};
+            sourceRect = {0, partSize * 2, (int) width(), partSize};
 
-            if (SDL_RenderCopy(_renderer, _texture, &sourceRect, &_dstRect) != 0) // TODO: #5
+            if (SDL_RenderCopy(renderer(), texture(), &sourceRect, &_dstRect) != 0)
                 printf("[ScreenButton::render] Error: Can't copy texture to renderer. Error: %s\n",
                        SDL_GetError());
             break;
         default:
-            // TODO: #5
             printf("[ScreenButton::render] Error: Unexpected behaviour. Can't identificate button state.\n");
             break;
     }
-}
-
-void ScreenButton::setTexture(SDL_Texture *texture)
-{
-    _texture = texture;
-    // TODO: Исправить printf на logger
-    if (texture)
-    {
-        if (SDL_QueryTexture(_texture, NULL, NULL, &_textureWidth, &_textureHeight) != 0)
-        {
-            // TODO: #1
-            printf("[ScreenButton::setTexture] Can't get texture size. Error: %s\n", SDL_GetError());
-            _textureHeight = 0;
-            _textureWidth = 0;
-        }
-    }
-    else
-    {
-        _textureHeight = 0;
-        _textureWidth = 0;
-    }
-
-    _dstRect.w = _textureWidth;
-    _dstRect.h = _textureHeight / 3;
-}
-
-SDL_Texture *ScreenButton::texture() const
-{
-    return _texture;
 }
 
 void ScreenButton::handleEvent(const SDL_Event &event)
@@ -174,4 +141,11 @@ int ScreenButton::y() const
 void ScreenButton::setCallback(std::function<void()> callback)
 {
     _callbackFunction = callback;
+}
+
+void ScreenButton::setTexture(SDL_Texture *texture)
+{
+    Entity::setTexture( texture );
+    _dstRect.w = width();
+    _dstRect.h = height() / 3;
 }

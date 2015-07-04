@@ -14,6 +14,20 @@ Vector2::Vector2(float x, float y)
     _y = y;
 }
 
+Vector2::Vector2( std::initializer_list<float> initializerList)
+{
+    if (initializerList.size() != 2)
+    {
+        _x = 0;
+        _y = 0;
+        printf("[Vector2::Vector2] Error: Wrong argumnets number in init.\n");
+        return;
+    }
+
+    _x = *initializerList.begin();
+    _y = *initializerList.begin() + 1;
+}
+
 Vector2::~Vector2()
 {
     //dtor
@@ -89,7 +103,6 @@ Vector2& Vector2::operator*=(const Vector2& b)
 
     return *this;
 }
-
 Vector2& Vector2::operator/=(const Vector2& b)
 {
     _x /= b._x;
@@ -97,6 +110,7 @@ Vector2& Vector2::operator/=(const Vector2& b)
 
     return *this;
 }
+
 /*
 Vector2& Vector2::operator=(const int& b)
 {

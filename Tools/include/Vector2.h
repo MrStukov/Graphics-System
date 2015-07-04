@@ -2,14 +2,19 @@
 #define VECTOR2_H
 
 #include <cstdio>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
+#include <initializer_list>
 #include "math.h"
+#include <algorithm>
 
+
+//TODO: Добавить документацию, плюс добавить ф-цию toString
 class Vector2
 {
     public:
         Vector2();
         Vector2(float x, float y);
+        Vector2(std::initializer_list<float> initializerList);
         virtual ~Vector2();
 
         float x() const;
