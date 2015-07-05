@@ -10,6 +10,15 @@
 
 namespace Colliders
 {
+    enum Direction
+    {
+        Direction_Top,
+        Direction_Left,
+        Direction_Right,
+        Direction_Bottom,
+        Direction_All
+    };
+
     struct Rectangle
     {
         int x;
@@ -18,6 +27,7 @@ namespace Colliders
         unsigned int height;
 
         bool operator==(const Rectangle &b) const;
+        Rectangle margin( int margin, Direction dir=Direction_All ) const;
     };
 
     struct Point
@@ -40,6 +50,7 @@ namespace Colliders
 
         void addCollider( const Rectangle &rectangle );
 
+        const std::vector < Colliders::Rectangle > &rectColliders() const;
     private:
         std::vector < Colliders::Rectangle > _rectangles;
     };

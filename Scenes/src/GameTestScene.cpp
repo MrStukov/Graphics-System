@@ -18,6 +18,7 @@ void GameTestScene::render()
     _mainPlayer.render();
 
     _map.renderUpper( renderer(), -_camera.x(), -_camera.y() );
+    _map.renderColliders(renderer(), -_camera.x(), -_camera.y());
 
     SDL_RenderPresent( renderer() );
 }
@@ -27,6 +28,30 @@ void GameTestScene::update()
     Scene::update();
     _camera.update();
     _cameraFollowController.update();
+
+    // TODO: Добавить settings с настройками клавиш. Переделать саму систему.
+
+    Colliders::Rectangle playerCollider = _mainPlayer.getCollider();
+    if (keyboardHolder().isKeyPressed(SDLK_w) &&
+            !_map.collidersHolder().isColliding(playerCollider.margin(
+                    (int) _mainPlayer.speed(), Colliders::Direction_Top)))
+        _mainPlayer.move( Player::Direction_Top );
+
+    if (keyboardHolder().isKeyPressed(SDLK_a) &&
+            !_map.collidersHolder().isColliding(playerCollider.margin(
+                    (int) _mainPlayer.speed(), Colliders::Direction_Left)))
+        _mainPlayer.move( Player::Direction_Left );
+
+    if (keyboardHolder().isKeyPressed(SDLK_s) &&
+            !_map.collidersHolder().isColliding(playerCollider.margin(
+                    (int) _mainPlayer.speed(), Colliders::Direction_Bottom)))
+        _mainPlayer.move( Player::Direction_Bottom );
+
+    if (keyboardHolder().isKeyPressed(SDLK_d) &&
+            !_map.collidersHolder().isColliding(playerCollider.margin(
+                    (int) _mainPlayer.speed(), Colliders::Direction_Right)))
+        _mainPlayer.move( Player::Direction_Right );
+
 }
 
 void GameTestScene::handleEvent( const SDL_Event &event )

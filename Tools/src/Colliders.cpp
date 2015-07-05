@@ -78,3 +78,34 @@ void Colliders::CollidersHolder::clear()
 {
     _rectangles.clear();
 }
+
+Colliders::Rectangle Colliders::Rectangle::margin(int margin, Direction dir) const
+{
+    Colliders::Rectangle newRect = (*this);
+
+    if (dir == Direction_Left || dir == Direction_All)
+        newRect.x -= margin;
+
+
+    if (dir == Direction_Top || dir == Direction_All)
+        newRect.y -= margin;
+
+    if (dir == Direction_All)
+    {
+        newRect.width += margin * 2;
+        newRect.height += margin * 2;
+    }
+
+    if (dir == Direction_Right)
+        newRect.width += margin;
+
+    if (dir == Direction_Bottom)
+        newRect.height += margin;
+
+    return newRect;
+}
+
+const std::vector<Colliders::Rectangle> &Colliders::CollidersHolder::rectColliders() const
+{
+    return _rectangles;
+}

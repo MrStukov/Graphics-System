@@ -587,3 +587,21 @@ const Colliders::CollidersHolder &TiledMap::collidersHolder() const
 {
     return _collidersHolder;
 }
+
+bool TiledMap::renderColliders(SDL_Renderer *renderer, int x, int y)
+{
+    std::for_each(
+            _collidersHolder.rectColliders().begin(),
+            _collidersHolder.rectColliders().end(),
+            [=](const Colliders::Rectangle &rectangle)
+            {
+                SDL_Rect srcRect = {
+                        rectangle.x + x,
+                        rectangle.y + y,
+                        rectangle.width,
+                        rectangle.height
+                };
+                SDL_RenderDrawRect(renderer, &srcRect);
+            }
+    );
+}

@@ -264,7 +264,7 @@ void Scene::KeyboardHolder::keyPressed(int key)
             key
     );
 
-    if (pos != _pressedKeys.end())
+    if (pos == _pressedKeys.end())
         _pressedKeys.push_back(key);
 }
 

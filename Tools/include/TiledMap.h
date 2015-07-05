@@ -28,8 +28,9 @@ public:
 
     bool loadMap( const std::string &path);
 
-    bool renderLower(SDL_Renderer* _renderer, int x, int y);
-    bool renderUpper(SDL_Renderer* _renderer, int x, int y);
+    bool renderLower(SDL_Renderer* renderer, int x, int y);
+    bool renderUpper(SDL_Renderer* renderer, int x, int y);
+    bool renderColliders( SDL_Renderer* renderer, int x, int y);
 
     const Colliders::CollidersHolder &collidersHolder() const;
 private:

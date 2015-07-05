@@ -7,7 +7,7 @@
 Player::Player() :
     Entity(nullptr)
 {
-
+    _speed = 2;
 }
 
 Player::Player(SDL_Renderer *renderer, const Vector2 &position) :
