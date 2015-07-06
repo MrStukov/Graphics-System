@@ -298,11 +298,12 @@ bool TiledMap::processColliderLayer(tinyxml2::XMLElement *colliderLayerNode)
     tinyxml2::XMLElement *objectNode = colliderLayerNode->FirstChildElement("object");
     while (objectNode)
     {
-        Colliders::Rectangle rectangle;
-        rectangle.x = atoi(objectNode->Attribute("x"));
-        rectangle.y = atoi(objectNode->Attribute("y"));
-        rectangle.width = (unsigned int) atoi(objectNode->Attribute("width"));
-        rectangle.height = (unsigned int) atoi(objectNode->Attribute("height"));
+        Colliders::RectangleCollider rectangle(
+                atoi(objectNode->Attribute("x")),
+                atoi(objectNode->Attribute("y")),
+                (unsigned int) atoi(objectNode->Attribute("width")),
+                (unsigned int) atoi(objectNode->Attribute("height"))
+        );
 
         _collidersHolder.addCollider(rectangle);
 
@@ -552,18 +553,19 @@ unsigned int TiledMap::TileLayer::tileHeight() const
 void TiledMap::TileLayer::render(SDL_Renderer *renderer, int x, int y)
 {
     for (unsigned int iy = 0; iy < _height; iy++)
+    {
         for (unsigned int ix = 0; ix < _width; ix++)
         {
             TileData data = _data[iy * _width + ix];
             Tileset tileset = _tilesets->operator[](data.tilesetIndex);
-            SDL_Rect destignationRect = {
+            SDL_Rect destinationRect = {
                     (int) (x + ix * _tileWidth),
                     (int) (y + iy * _tileHeight),
                     (int) _tileWidth,
                     (int) _tileHeight
             };
             SDL_Rect sourceRect = tileset.getTileSourceRect(data.id);
-            if (SDL_RenderCopy(renderer, tileset.texture(), &sourceRect, &destignationRect))
+            if (SDL_RenderCopy(renderer, tileset.texture(), &sourceRect, &destinationRect))
             {
                 printf("[TileLayer::render] Error: Can't render tile (ID: %d)\n"
                                "   Error: %s\n",
@@ -571,6 +573,7 @@ void TiledMap::TileLayer::render(SDL_Renderer *renderer, int x, int y)
                 return;
             }
         }
+    }
 }
 
 void TiledMap::TileLayer::setTilesets(std::vector<TiledMap::Tileset> *tilesets)
@@ -583,9 +586,9 @@ std::vector<TiledMap::Tileset> *TiledMap::TileLayer::tilesets() const
     return _tilesets;
 }
 
-const Colliders::CollidersHolder &TiledMap::collidersHolder() const
+Colliders::CollisionController *TiledMap::collisionController()
 {
-    return _collidersHolder;
+    return &_collidersHolder;
 }
 
 bool TiledMap::renderColliders(SDL_Renderer *renderer, int x, int y)
@@ -593,7 +596,7 @@ bool TiledMap::renderColliders(SDL_Renderer *renderer, int x, int y)
     std::for_each(
             _collidersHolder.rectColliders().begin(),
             _collidersHolder.rectColliders().end(),
-            [=](const Colliders::Rectangle &rectangle)
+            [=](const Colliders::RectangleCollider &rectangle)
             {
                 SDL_Rect srcRect = {
                         rectangle.x + x,
@@ -604,4 +607,6 @@ bool TiledMap::renderColliders(SDL_Renderer *renderer, int x, int y)
                 SDL_RenderDrawRect(renderer, &srcRect);
             }
     );
+
+    return true;
 }

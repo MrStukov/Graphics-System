@@ -4,50 +4,50 @@
 
 #include "Colliders.h"
 
-bool Colliders::Rectangle::operator==(Colliders::Rectangle const &b) const
+bool Colliders::RectangleCollider::operator==(Colliders::RectangleCollider const &b) const
 {
     return b.x == x && b.y == y && b.width == width && b.height == height;
 }
 
-bool ::Colliders::isColliding(Colliders::Rectangle const &a, Colliders::Rectangle const &b)
+bool ::Colliders::isColliding(Colliders::RectangleCollider const &a, Colliders::RectangleCollider const &b)
 {
     // Обратная проверка.
-    return !((a.x > b.x + b.width) ||
-             (a.y > b.y + b.height) ||
-             (a.x + a.width < b.x) ||
-             (a.y + a.height < b.y));
+    return !((a.x >= b.x + b.width) ||
+             (a.y >= b.y + b.height) ||
+             (a.x + a.width <= b.x) ||
+             (a.y + a.height <= b.y));
 }
 
-bool ::Colliders::isColliding(const Colliders::Rectangle &a, const Colliders::Point &b)
+bool ::Colliders::isColliding(const Colliders::RectangleCollider &a, const Colliders::PointCollider &b)
 {
-    return !((b.x > a.x + a.width) ||
-             (b.y > a.y + a.width) ||
-             (b.x < a.x) ||
-             (b.y < a.y));
+    return !((b.x >= a.x + a.width) ||
+             (b.y >= a.y + a.width) ||
+             (b.x <= a.x) ||
+             (b.y <= a.y));
 }
 
-bool ::Colliders::isColliding(const Colliders::Point &a, const Colliders::Rectangle &b)
+bool ::Colliders::isColliding(const Colliders::PointCollider &a, const Colliders::RectangleCollider &b)
 {
-    return !((a.x > b.x + b.width) ||
-             (a.y > b.y + b.width) ||
-             (a.x < b.x) ||
-             (a.y < b.y));
+    return !((a.x >= b.x + b.width) ||
+             (a.y >= b.y + b.width) ||
+             (a.x <= b.x) ||
+             (a.y <= b.y));
 }
 
-Colliders::CollidersHolder::CollidersHolder()
-{
-
-}
-
-Colliders::CollidersHolder::~CollidersHolder()
+Colliders::CollisionController::CollisionController()
 {
 
 }
 
-bool Colliders::CollidersHolder::isColliding(Colliders::Rectangle const &a) const
+Colliders::CollisionController::~CollisionController()
+{
+
+}
+
+bool Colliders::CollisionController::isColliding(Colliders::RectangleCollider const &a) const
 {
     bool colliding = false;
-    for (std::vector<Colliders::Rectangle>::const_iterator iterator = _rectangles.begin();
+    for (std::vector<Colliders::RectangleCollider>::const_iterator iterator = _rectangles.begin();
          iterator != _rectangles.end() && !colliding;
          iterator++)
         if (Colliders::isColliding((*iterator), a))
@@ -56,10 +56,10 @@ bool Colliders::CollidersHolder::isColliding(Colliders::Rectangle const &a) cons
     return colliding;
 }
 
-bool Colliders::CollidersHolder::isColliding(Colliders::Point const &a) const
+bool Colliders::CollisionController::isColliding(Colliders::PointCollider const &a) const
 {
     bool colliding = false;
-    for (std::vector<Colliders::Rectangle>::const_iterator iterator = _rectangles.begin();
+    for (std::vector<Colliders::RectangleCollider>::const_iterator iterator = _rectangles.begin();
          iterator != _rectangles.end() && !colliding;
          iterator++)
         if (Colliders::isColliding((*iterator), a))
@@ -69,19 +69,19 @@ bool Colliders::CollidersHolder::isColliding(Colliders::Point const &a) const
 }
 
 
-void Colliders::CollidersHolder::addCollider(Colliders::Rectangle const &rectangle)
+void Colliders::CollisionController::addCollider(Colliders::RectangleCollider const &rectangle)
 {
     _rectangles.push_back(rectangle);
 }
 
-void Colliders::CollidersHolder::clear()
+void Colliders::CollisionController::clear()
 {
     _rectangles.clear();
 }
 
-Colliders::Rectangle Colliders::Rectangle::margin(int margin, Direction dir) const
+Colliders::RectangleCollider Colliders::RectangleCollider::margin(int margin, Direction dir) const
 {
-    Colliders::Rectangle newRect = (*this);
+    Colliders::RectangleCollider newRect = (*this);
 
     if (dir == Direction_Left || dir == Direction_All)
         newRect.x -= margin;
@@ -105,7 +105,7 @@ Colliders::Rectangle Colliders::Rectangle::margin(int margin, Direction dir) con
     return newRect;
 }
 
-const std::vector<Colliders::Rectangle> &Colliders::CollidersHolder::rectColliders() const
+const std::vector<Colliders::RectangleCollider> &Colliders::CollisionController::rectColliders() const
 {
     return _rectangles;
 }

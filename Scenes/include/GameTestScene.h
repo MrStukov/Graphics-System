@@ -25,6 +25,7 @@ protected:
     virtual void init() override;
 
 private:
+    Subscriber<Colliders::CollisionController> _collisionControllerSubscriber;
     Player _mainPlayer;
     TiledMap _map;
     Camera _camera;

@@ -47,6 +47,6 @@ add_executable(Graphics_System ${SOURCE_FILES}
     GraphicsItems/include/Entity.h
     Tools/src/SettingsHolder.cpp
     Tools/include/SettingsHolder.h
-)
+Tools/src/Subscriber.cpp Tools/include/Subscriber.h GraphicsItems/src/PhysicsEntity.cpp GraphicsItems/include/PhysicsEntity.h)
 
 target_link_libraries(Graphics_System -lSDL2 -lSDL2_image -lz)

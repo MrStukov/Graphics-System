@@ -14,7 +14,7 @@
 #include "Compression.h"
 #include "Colliders.h"
 
-// TODO: Добавить рендер с предусмотрением неполного рендеринга
+// TODO: Добавить комментариев
 
 class TiledMap
 {
@@ -32,7 +32,7 @@ public:
     bool renderUpper(SDL_Renderer* renderer, int x, int y);
     bool renderColliders( SDL_Renderer* renderer, int x, int y);
 
-    const Colliders::CollidersHolder &collidersHolder() const;
+    Colliders::CollisionController *collisionController();
 private:
     /*
      * Приватные классы.
@@ -155,7 +155,7 @@ private:
     /*
      * Приватные члены.
      */
-    Colliders::CollidersHolder _collidersHolder;
+    Colliders::CollisionController _collidersHolder;
 
     unsigned int _xSize;
     unsigned int _ySize;

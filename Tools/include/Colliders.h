@@ -19,45 +19,50 @@ namespace Colliders
         Direction_All
     };
 
-    struct Rectangle
+    struct RectangleCollider
     {
+
         int x;
         int y;
         unsigned int width;
         unsigned int height;
 
-        bool operator==(const Rectangle &b) const;
-        Rectangle margin( int margin, Direction dir=Direction_All ) const;
+        RectangleCollider(int x, int y, unsigned int width, unsigned int height) :
+                x(x), y(y), width(width), height(height)
+        { }
+
+        bool operator==(const RectangleCollider &b) const;
+        RectangleCollider margin( int margin, Direction dir=Direction_All ) const;
     };
 
-    struct Point
+    struct PointCollider
     {
         int x;
         int y;
     };
 
-    class CollidersHolder
+    class CollisionController
     {
     // TODO: Добавить разделение на несколько массивов для того, что бы не обрабатывать много данных.
     public:
-        CollidersHolder();
-        ~CollidersHolder();
+        CollisionController();
+        ~CollisionController();
 
         void clear();
 
-        bool isColliding( const Rectangle &a ) const;
-        bool isColliding( const Point &a ) const;
+        bool isColliding( const RectangleCollider &a ) const;
+        bool isColliding( const PointCollider &a ) const;
 
-        void addCollider( const Rectangle &rectangle );
+        void addCollider( const RectangleCollider &rectangle );
 
-        const std::vector < Colliders::Rectangle > &rectColliders() const;
+        const std::vector < Colliders::RectangleCollider> &rectColliders() const;
     private:
-        std::vector < Colliders::Rectangle > _rectangles;
+        std::vector < Colliders::RectangleCollider> _rectangles;
     };
 
-    bool isColliding( const Rectangle& a, const Rectangle &b );
-    bool isColliding( const Rectangle& a, const Point &b );
-    bool isColliding( const Point &a, const Rectangle &b );
+    bool isColliding( const RectangleCollider & a, const RectangleCollider &b );
+    bool isColliding( const RectangleCollider & a, const PointCollider &b );
+    bool isColliding( const PointCollider &a, const RectangleCollider &b );
 };
 
 

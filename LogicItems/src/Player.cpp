@@ -5,13 +5,13 @@
 #include "Player.h"
 
 Player::Player() :
-    Entity(nullptr)
+    PhysicsEntity(nullptr)
 {
-    _speed = 2;
+    setSpeed(2);
 }
 
 Player::Player(SDL_Renderer *renderer, const Vector2 &position) :
-    Entity(renderer)
+    PhysicsEntity(renderer)
 {
     setPosition(position);
 }
@@ -19,47 +19,6 @@ Player::Player(SDL_Renderer *renderer, const Vector2 &position) :
 Player::~Player()
 {
 
-}
-
-void Player::setSpeed(float speed)
-{
-    _speed = speed;
-}
-
-float Player::speed() const
-{
-    return _speed;
-}
-
-void Player::move(Direction dir)
-{
-    switch (dir)
-    {
-    case Direction_Top:
-        setPosition( position() + Vector2(0, -_speed) );
-        break;
-    case Direction_Right:
-        setPosition( position() + Vector2(_speed, 0) );
-        break;
-    case Direction_Left:
-        setPosition( position() + Vector2(-_speed, 0) );
-        break;
-    case Direction_Bottom:
-        setPosition( position() + Vector2(0, _speed) );
-        break;
-    }
-}
-
-Colliders::Rectangle Player::getCollider() const
-{
-    Colliders::Rectangle rectangle;
-    rectangle.x = position().intX();
-    rectangle.y = position().intY();
-
-    rectangle.width = width();
-    rectangle.height = height();
-
-    return rectangle;
 }
 
 void Player::render()

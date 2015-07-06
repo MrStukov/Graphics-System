@@ -1,4 +1,5 @@
 #include <MainMenuScene.h>
+#include <Colliders.h>
 #include "Application.h"
 
 int main()
